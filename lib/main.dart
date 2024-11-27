@@ -36,6 +36,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
+// update title
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
 
