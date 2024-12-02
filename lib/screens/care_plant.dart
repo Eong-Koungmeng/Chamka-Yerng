@@ -1,6 +1,6 @@
 import 'dart:io';
-import 'package:florae/data/plant.dart';
-import 'package:florae/screens/picture_viewer.dart';
+import 'package:chamka_yerng/data/plant.dart';
+import 'package:chamka_yerng/screens/picture_viewer.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../data/care.dart';

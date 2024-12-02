@@ -1,7 +1,7 @@
 import 'dart:io';
 
-import 'package:florae/data/default.dart';
-import 'package:florae/data/plant.dart';
+import 'package:chamka_yerng/data/default.dart';
+import 'package:chamka_yerng/data/plant.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';

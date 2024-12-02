@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:florae/data/plant.dart';
+import 'package:chamka_yerng/data/plant.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Garden {
