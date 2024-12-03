@@ -105,3 +105,7 @@ flutter:
         - asset: assets/NotoSans-Bold.ttf
         - asset: assets/NotoSans-BoldItalic.ttf
           style: italic
+    - family: NotoSansKhmer
+      fonts:
+        - asset: assets/NotoSansKhmer-Regular.ttf
+        - asset: assets/NotoSansKhmer-Bold.ttf

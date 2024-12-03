@@ -119,6 +119,7 @@ class FloraeApp extends StatelessWidget {
           Locale('zh'), // Chinese (Simplified, People's Republic of China)
           Locale('ru'), // Russian
           Locale('ar'), // Arabic
+          Locale('km'),
         ],
         theme: buildLightThemeData(),
         darkTheme: buildDarkThemeData(),
