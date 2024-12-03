@@ -25,7 +25,7 @@ Future<void> main() async {
   String? locale = Platform.localeName.substring(0, 2);
   await prefs.setString('locale', locale);
 
-  runApp(const FloraeApp());
+  runApp(const ChamkaYerngApp());
 
   BackgroundFetch.registerHeadlessTask(backgroundFetchHeadlessTask);
 }
@@ -90,8 +90,8 @@ void backgroundFetchHeadlessTask(HeadlessTask task) async {
   BackgroundFetch.finish(taskId);
 }
 
-class FloraeApp extends StatelessWidget {
-  const FloraeApp({Key? key}) : super(key: key);
+class ChamkaYerngApp extends StatelessWidget {
+  const ChamkaYerngApp({Key? key}) : super(key: key);
 
   // This widget is the root of your application.
   @override
