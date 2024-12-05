@@ -51,7 +51,7 @@ android {
 
     defaultConfig {
         applicationId "cat.naval.florae"
-        minSdkVersion flutter.minSdkVersion
+        minSdkVersion 24
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName

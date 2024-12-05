@@ -1,8 +1,12 @@
 import 'dart:io';
 import 'package:background_fetch/background_fetch.dart';
 import 'package:chamka_yerng/screens/error.dart';
+import 'package:chamka_yerng/screens/forgot_password_screen.dart';
+import 'package:chamka_yerng/screens/login_screen.dart';
+import 'package:chamka_yerng/screens/register_screen.dart';
 import 'package:chamka_yerng/themes/darkTheme.dart';
 import 'package:chamka_yerng/themes/lightTheme.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'data/care.dart';
 import 'data/plant.dart';
@@ -19,6 +23,8 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   garden = await Garden.load();
+
+  await Firebase.initializeApp();
 
   // Set default locale for background service
   final prefs = await SharedPreferences.getInstance();
@@ -117,6 +123,13 @@ class ChamkaYerngApp extends StatelessWidget {
         ],
         theme: buildLightThemeData(),
         darkTheme: buildDarkThemeData(),
-        home: const MyHomePage(title: 'Today'));
+        initialRoute: '/login',
+        routes: {
+          '/login': (context) => LoginPage(),
+          '/register': (context) => RegisterPage(),
+          '/forgot-password': (context) => ForgotPasswordPage(),
+          '/home': (context) => MyHomePage(title: 'Today'),
+        },
+        );
   }
 }
