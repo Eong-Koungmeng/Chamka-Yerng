@@ -123,7 +123,8 @@ class ChamkaYerngApp extends StatelessWidget {
         ],
         theme: buildLightThemeData(),
         darkTheme: buildDarkThemeData(),
-        initialRoute: '/login',
+        home: MyHomePage(title: 'Today'),
+        initialRoute: '/home',
         routes: {
           '/login': (context) => LoginPage(),
           '/register': (context) => RegisterPage(),
