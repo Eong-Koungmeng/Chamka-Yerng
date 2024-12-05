@@ -6,6 +6,7 @@ ThemeData buildDarkThemeData() {
     scaffoldBackgroundColor: Colors.black,
     primaryColor: Colors.tealAccent,
     fontFamily: "NotoSans",
+    fontFamilyFallback: const ["NotoSansKhmer"],
     colorScheme: const ColorScheme.dark(
         surfaceTint: Colors.transparent,
         primary: Colors.white70,

@@ -137,29 +137,6 @@ class _SettingsScreen extends State<SettingsScreen> {
                       }),
                 ]),
               ),
-              Card(
-                  semanticContainer: true,
-                  clipBehavior: Clip.antiAliasWithSaveLayer,
-                  elevation: 2,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                  child: Column(children: <Widget>[
-                    ListTile(
-                        trailing: const Icon(Icons.arrow_right),
-                        leading: const Icon(Icons.text_snippet,
-                            color: Colors.lightGreen),
-                        title: Text(
-                            AppLocalizations.of(context)!.aboutFloraeButton),
-                        onTap: () {
-                          showAboutDialog(
-                            context: context,
-                            applicationName: 'Florae',
-                            applicationVersion: '3.0.0',
-                            applicationLegalese: '© Naval Alcalá',
-                          );
-                        }),
-                  ])),
               const SizedBox(height: 70),
             ],
           ),

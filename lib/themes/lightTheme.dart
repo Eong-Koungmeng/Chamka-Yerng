@@ -5,6 +5,7 @@ ThemeData buildLightThemeData() {
     primaryColor: Colors.teal,
     scaffoldBackgroundColor: Colors.grey[100],
     fontFamily: "NotoSans",
+    fontFamilyFallback: const ["NotoSansKhmer"],
     colorScheme: const ColorScheme.light(
         surfaceTint: Colors.transparent,
         primary: Colors.black54,
