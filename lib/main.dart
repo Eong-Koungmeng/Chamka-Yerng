@@ -113,12 +113,6 @@ class ChamkaYerngApp extends StatelessWidget {
         },
         supportedLocales: const [
           Locale('en'), // English
-          Locale('es'), // Spanish
-          Locale('fr'), // French
-          Locale('nl'), // Dutch
-          Locale('zh'), // Chinese (Simplified, People's Republic of China)
-          Locale('ru'), // Russian
-          Locale('ar'), // Arabic
           Locale('km'),
         ],
         theme: buildLightThemeData(),
