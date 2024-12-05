@@ -55,9 +55,10 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyCf-Kds7LC7j5PmCY5ZFs-0BEPjJC-uXQE',
-    appId: '1:829481770217:android:3977c56f1a90c92d922478',
+    appId: '1:829481770217:android:f9e1e966f062640f922478',
     messagingSenderId: '829481770217',
     projectId: 'chamka-yerng',
     storageBucket: 'chamka-yerng.firebasestorage.app',
   );
+
 }

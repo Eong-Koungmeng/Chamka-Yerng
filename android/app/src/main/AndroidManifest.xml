@@ -1,6 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="cat.naval.florae">
+    package="com.ite.chamkayerng">
 
    <application
         tools:replace="android:label"

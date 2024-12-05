@@ -7,9 +7,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:829481770217:android:3977c56f1a90c92d922478",
+        "mobilesdk_app_id": "1:829481770217:android:f9e1e966f062640f922478",
         "android_client_info": {
-          "package_name": "cat.naval.florae"
+          "package_name": "com.ite.chamkayerng"
         }
       },
       "oauth_client": [],
