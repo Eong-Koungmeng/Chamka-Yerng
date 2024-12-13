@@ -20,7 +20,7 @@ import 'manage_plant.dart';
 import 'care_plant.dart';
 import 'settings.dart';
 
-enum Page { today, garden }
+enum Page { today, garden, shop}
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({Key? key, required this.title}) : super(key: key);
@@ -336,10 +336,16 @@ class _MyHomePageState extends State<MyHomePage> {
             icon: const Icon(Icons.grass_outlined),
             label: AppLocalizations.of(context)!.buttonGarden,
           ),
+          NavigationDestination(
+            selectedIcon: Icon(Icons.store,
+                color: Theme.of(context).colorScheme.surface),
+            icon: const Icon(Icons.store_outlined),
+            label: AppLocalizations.of(context)!.buttonShop,
+          ),
         ],
       ),
 
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           await Navigator.push(

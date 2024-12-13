@@ -5,6 +5,7 @@
   "mainNoPlants": "The garden is empty, shall we plant something?",
   "buttonGarden": "Garden",
   "buttonToday": "Today",
+  "buttonShop": "Shop",
   "tooltipCareAll": "Apply care to all plants",
   "tooltipShowCalendar": "Show Calendar",
   "tooltipSettings": "Settings",
