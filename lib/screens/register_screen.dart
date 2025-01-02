@@ -3,6 +3,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 
 import '../model/user_model.dart';
+import 'home_page.dart';
 
 class RegisterPage extends StatelessWidget {
   final TextEditingController usernameController = TextEditingController();
@@ -45,7 +46,11 @@ class RegisterPage extends StatelessWidget {
         await userRef.set(newUser.toMap());
 
         // Navigate to home page
-        Navigator.pushReplacementNamed(context, '/home');
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => MyHomePage(title: 'Today')),
+              (route) => false, // This removes all previous routes
+        );
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(

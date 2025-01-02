@@ -6,6 +6,7 @@ import 'package:chamka_yerng/screens/login_screen.dart';
 import 'package:chamka_yerng/screens/register_screen.dart';
 import 'package:chamka_yerng/themes/darkTheme.dart';
 import 'package:chamka_yerng/themes/lightTheme.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'data/care.dart';
@@ -31,7 +32,9 @@ Future<void> main() async {
   String? locale = Platform.localeName.substring(0, 2);
   await prefs.setString('locale', locale);
 
-  runApp(const ChamkaYerngApp());
+  final currentUser = FirebaseAuth.instance.currentUser;
+
+  runApp(ChamkaYerngApp(isLoggedIn: currentUser != null));
 
   BackgroundFetch.registerHeadlessTask(backgroundFetchHeadlessTask);
 }
@@ -97,7 +100,12 @@ void backgroundFetchHeadlessTask(HeadlessTask task) async {
 }
 
 class ChamkaYerngApp extends StatelessWidget {
-  const ChamkaYerngApp({Key? key}) : super(key: key);
+  final bool isLoggedIn;
+
+  const ChamkaYerngApp({
+    Key? key,
+    this.isLoggedIn = false,
+  }) : super(key: key);
 
   // This widget is the root of your application.
   @override
@@ -119,18 +127,13 @@ class ChamkaYerngApp extends StatelessWidget {
         },
         supportedLocales: const [
           Locale('en'), // English
-          Locale('km'),
+          Locale('km'), // Khmer
         ],
         theme: buildLightThemeData(),
         darkTheme: buildDarkThemeData(),
-        // home: MyHomePage(title: 'Today'),
-        initialRoute: '/login',
-        routes: {
-          '/login': (context) => LoginPage(),
-          '/register': (context) => RegisterPage(),
-          '/forgot-password': (context) => ForgotPasswordPage(),
-          '/home': (context) => MyHomePage(title: 'Today'),
-        },
+        home: isLoggedIn
+            ? MyHomePage(title: 'Today')
+            : LoginPage(),
         );
   }
 }

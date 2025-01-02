@@ -3,6 +3,9 @@ import 'package:chamka_yerng/notifications.dart' as notify;
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
+import 'login_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({Key? key, required this.title}) : super(key: key);
@@ -15,6 +18,23 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreen extends State<SettingsScreen> {
   int notificationTempo = 60;
+
+  void _handleLogout(BuildContext context) async {
+    try {
+      await FirebaseAuth.instance.signOut();
+      if (context.mounted) {
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => LoginPage()),
+              (route) => false,
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Logout failed: $e')),
+      );
+    }
+  }
 
   void _showIntegerDialog() async {
     FocusManager.instance.primaryFocus?.unfocus();
@@ -135,6 +155,15 @@ class _SettingsScreen extends State<SettingsScreen> {
                             AppLocalizations.of(context)!.testNotificationBody,
                             2);
                       }),
+                  const Divider(height: 1),
+
+                  // Add Logout ListTile
+                  ListTile(
+                    trailing: const Icon(Icons.arrow_right),
+                    leading: const Icon(Icons.logout, color: Colors.red),
+                    title: Text(AppLocalizations.of(context)?.logout ?? 'Logout'),
+                    onTap: () => _handleLogout(context),
+                  ),
                 ]),
               ),
               const SizedBox(height: 70),
