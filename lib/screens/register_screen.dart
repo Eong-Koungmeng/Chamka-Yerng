@@ -1,11 +1,16 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+
+import '../model/user_model.dart';
 
 class RegisterPage extends StatelessWidget {
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confirmPasswordController = TextEditingController();
+
+  RegisterPage({super.key});
 
   void register(BuildContext context) async {
     if (passwordController.text != confirmPasswordController.text) {
@@ -17,25 +22,39 @@ class RegisterPage extends StatelessWidget {
 
     try {
       // Create a new user in Firebase Auth
-      await FirebaseAuth.instance.createUserWithEmailAndPassword(
+      UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: emailController.text,
         password: passwordController.text,
       );
 
-      // Optionally update the user's display name
-      User? user = FirebaseAuth.instance.currentUser;
-      if (user != null) {
-        await user.updateDisplayName(usernameController.text);
-      }
+      // Get the UID of the newly created user
+      User? user = userCredential.user;
 
-      // Navigate to home page
-      Navigator.pushReplacementNamed(context, '/login');
+      if (user != null) {
+        String uid = user.uid;
+
+        // Create a UserModel instance
+        UserModel newUser = UserModel(
+          uid: uid,
+          username: usernameController.text,
+          email: emailController.text,
+        );
+
+        // Save the user data to Firebase Realtime Database
+        DatabaseReference userRef = FirebaseDatabase.instance.ref().child('users').child(uid);
+        await userRef.set(newUser.toMap());
+
+        // Navigate to home page
+        Navigator.pushReplacementNamed(context, '/home');
+      }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Registration failed: $e')),
       );
     }
   }
+
+
 
   @override
   Widget build(BuildContext context) {

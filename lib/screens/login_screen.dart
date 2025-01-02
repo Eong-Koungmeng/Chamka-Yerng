@@ -5,6 +5,8 @@ class LoginPage extends StatelessWidget {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
+  LoginPage({super.key});
+
   void login(BuildContext context) async {
     try {
       await FirebaseAuth.instance.signInWithEmailAndPassword(

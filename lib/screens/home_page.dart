@@ -240,6 +240,7 @@ class _MyHomePageState extends State<MyHomePage> {
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
         title: FittedBox(fit: BoxFit.fitWidth, child: Text(title)),
+        automaticallyImplyLeading: false,
         titleTextStyle: Theme.of(context).textTheme.displayLarge,
         actions: <Widget>[
           _currentPage == Page.today
