@@ -1,14 +1,14 @@
 import 'dart:io';
 import 'package:background_fetch/background_fetch.dart';
+import 'package:chamka_yerng/provider/app_settings.dart';
 import 'package:chamka_yerng/screens/error.dart';
-import 'package:chamka_yerng/screens/forgot_password_screen.dart';
 import 'package:chamka_yerng/screens/login_screen.dart';
-import 'package:chamka_yerng/screens/register_screen.dart';
 import 'package:chamka_yerng/themes/darkTheme.dart';
 import 'package:chamka_yerng/themes/lightTheme.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'data/care.dart';
 import 'data/plant.dart';
 import 'data/garden.dart';
@@ -20,21 +20,23 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 late Garden garden;
 
-Future<void> main() async {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   garden = await Garden.load();
-
   await Firebase.initializeApp();
 
-  // Set default locale for background service
-  final prefs = await SharedPreferences.getInstance();
-  String? locale = Platform.localeName.substring(0, 2);
-  await prefs.setString('locale', locale);
+  final appSettings = AppSettings();
+  await appSettings.loadPreferences();
 
   final currentUser = FirebaseAuth.instance.currentUser;
 
-  runApp(ChamkaYerngApp(isLoggedIn: currentUser != null));
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => appSettings,
+      child: ChamkaYerngApp(isLoggedIn: currentUser != null),
+    ),
+  );
 
   BackgroundFetch.registerHeadlessTask(backgroundFetchHeadlessTask);
 }
@@ -98,42 +100,32 @@ void backgroundFetchHeadlessTask(HeadlessTask task) async {
 
   BackgroundFetch.finish(taskId);
 }
-
 class ChamkaYerngApp extends StatelessWidget {
   final bool isLoggedIn;
 
-  const ChamkaYerngApp({
-    Key? key,
-    this.isLoggedIn = false,
-  }) : super(key: key);
+  const ChamkaYerngApp({Key? key, required this.isLoggedIn}) : super(key: key);
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-        title: 'Chamka Yerng',
-        localizationsDelegates: const [
-          AppLocalizations.delegate, // Add this line
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-        builder: (BuildContext context, Widget? widget) {
-          ErrorWidget.builder = (FlutterErrorDetails errorDetails) {
-            return ErrorPage(errorDetails: errorDetails);
-          };
+    final appSettings = Provider.of<AppSettings>(context);
 
-          return widget!;
-        },
-        supportedLocales: const [
-          Locale('en'), // English
-          Locale('km'), // Khmer
-        ],
-        theme: buildLightThemeData(),
-        darkTheme: buildDarkThemeData(),
-        home: isLoggedIn
-            ? MyHomePage(title: 'Today')
-            : LoginPage(),
-        );
+    return MaterialApp(
+      title: 'Chamka Yerng',
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('en'), // English
+        Locale('km'), // Khmer
+      ],
+      locale: appSettings.locale,
+      theme: buildLightThemeData(),
+      darkTheme: buildDarkThemeData(),
+      themeMode: appSettings.themeMode,
+      home: isLoggedIn ? MyHomePage(title: 'Today') : LoginPage(),
+    );
   }
 }

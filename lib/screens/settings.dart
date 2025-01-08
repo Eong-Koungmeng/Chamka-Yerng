@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:chamka_yerng/notifications.dart' as notify;
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import '../provider/app_settings.dart';
 import 'login_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -18,6 +20,8 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreen extends State<SettingsScreen> {
   int notificationTempo = 60;
+  String selectedLanguage = 'en';
+  bool isDarkTheme = false;
 
   void _handleLogout(BuildContext context) async {
     try {
@@ -82,7 +86,16 @@ class _SettingsScreen extends State<SettingsScreen> {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
       notificationTempo = prefs.getInt('notificationTempo') ?? 60;
+      selectedLanguage = prefs.getString('selectedLanguage') ?? 'en';
+      isDarkTheme = prefs.getBool('isDarkTheme') ?? false;
     });
+  }
+
+  Future<void> savePreferences() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('notificationTempo', notificationTempo);
+    await prefs.setString('selectedLanguage', selectedLanguage);
+    await prefs.setBool('isDarkTheme', isDarkTheme);
   }
 
   @override
@@ -92,12 +105,9 @@ class _SettingsScreen extends State<SettingsScreen> {
   }
 
   @override
-  void dispose() {
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final appSettings = Provider.of<AppSettings>(context);
+
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 70,
@@ -110,7 +120,6 @@ class _SettingsScreen extends State<SettingsScreen> {
         shadowColor: Colors.transparent,
         titleTextStyle: Theme.of(context).textTheme.displayLarge,
       ),
-      //passing in the ListView.builder
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(15.0),
@@ -125,22 +134,23 @@ class _SettingsScreen extends State<SettingsScreen> {
                 ),
                 child: Column(children: <Widget>[
                   ListTile(
-                      trailing: const Icon(Icons.arrow_right),
-                      leading: const Icon(Icons.alarm, color: Colors.blue),
-                      title: Text(AppLocalizations.of(context)!.notifyEvery),
-                      subtitle: notificationTempo != 0
-                          ? Text((notificationTempo / 60).round().toString() +
-                              " ${AppLocalizations.of(context)!.hours}")
-                          : Text(AppLocalizations.of(context)!.never),
-                      onTap: () {
-                        _showIntegerDialog();
-                      }),
+                    trailing: const Icon(Icons.arrow_right),
+                    leading: const Icon(Icons.alarm, color: Colors.blue),
+                    title: Text(AppLocalizations.of(context)!.notifyEvery),
+                    subtitle: notificationTempo != 0
+                        ? Text((notificationTempo / 60).round().toString() +
+                        " ${AppLocalizations.of(context)!.hours}")
+                        : Text(AppLocalizations.of(context)!.never),
+                    onTap: () {
+                      _showIntegerDialog();
+                    },
+                  ),
                   ListTile(
                     leading: const Icon(Icons.info_outline_rounded),
                     subtitle: Transform.translate(
                       offset: const Offset(-10, -5),
                       child:
-                          Text(AppLocalizations.of(context)!.notificationInfo),
+                      Text(AppLocalizations.of(context)!.notificationInfo),
                     ),
                   ),
                   ListTile(
@@ -157,11 +167,43 @@ class _SettingsScreen extends State<SettingsScreen> {
                       }),
                   const Divider(height: 1),
 
-                  // Add Logout ListTile
+                  // Language Selection
+                  ListTile(
+                    leading: const Icon(Icons.language, color: Colors.green),
+                    title: Text("language"),
+                    subtitle: Text(appSettings.locale.languageCode == 'en'
+                        ? 'English'
+                        : 'Khmer'),
+                    onTap: () async {
+                      final newLocale = appSettings.locale.languageCode == 'en'
+                          ? const Locale('km')
+                          : const Locale('en');
+                      await appSettings.updateLocale(newLocale);
+                    },
+                  ),
+
+                  // Theme Selection
+                  ListTile(
+                    leading: const Icon(Icons.brightness_6, color: Colors.amber),
+                    title: Text("theme"),
+                    subtitle: Text(appSettings.themeMode == ThemeMode.dark
+                        ? 'Dark'
+                        : 'Light'),
+                    onTap: () async {
+                      final newThemeMode = appSettings.themeMode ==
+                          ThemeMode.dark
+                          ? ThemeMode.light
+                          : ThemeMode.dark;
+                      await appSettings.updateThemeMode(newThemeMode);
+                    },
+                  ),
+
+                  // Logout Option
                   ListTile(
                     trailing: const Icon(Icons.arrow_right),
                     leading: const Icon(Icons.logout, color: Colors.red),
-                    title: Text(AppLocalizations.of(context)?.logout ?? 'Logout'),
+                    title:
+                    Text(AppLocalizations.of(context)?.logout ?? 'Logout'),
                     onTap: () => _handleLogout(context),
                   ),
                 ]),
