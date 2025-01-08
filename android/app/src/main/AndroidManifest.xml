@@ -4,8 +4,9 @@
 
    <application
         tools:replace="android:label"
+        android:icon="@mipmap/ic_launcher"
         android:label="Chamka Yerng">
-    <!--android:icon="@mipmap/ic_launcher"-->
+
     <activity
         android:name=".MainActivity"
         android:launchMode="singleTop"
