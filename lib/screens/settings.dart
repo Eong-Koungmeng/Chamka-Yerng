@@ -90,14 +90,6 @@ class _SettingsScreen extends State<SettingsScreen> {
       isDarkTheme = prefs.getBool('isDarkTheme') ?? false;
     });
   }
-
-  Future<void> savePreferences() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setInt('notificationTempo', notificationTempo);
-    await prefs.setString('selectedLanguage', selectedLanguage);
-    await prefs.setBool('isDarkTheme', isDarkTheme);
-  }
-
   @override
   void initState() {
     super.initState();
