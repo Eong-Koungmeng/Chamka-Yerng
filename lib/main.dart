@@ -4,6 +4,7 @@ import 'package:chamka_yerng/screens/error.dart';
 import 'package:chamka_yerng/screens/forgot_password_screen.dart';
 import 'package:chamka_yerng/screens/login_screen.dart';
 import 'package:chamka_yerng/screens/register_screen.dart';
+import 'package:chamka_yerng/screens/shop_screen.dart';
 import 'package:chamka_yerng/themes/darkTheme.dart';
 import 'package:chamka_yerng/themes/lightTheme.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -124,12 +125,13 @@ class ChamkaYerngApp extends StatelessWidget {
         theme: buildLightThemeData(),
         darkTheme: buildDarkThemeData(),
         // home: MyHomePage(title: 'Today'),
-        initialRoute: '/login',
+        initialRoute: '/home',
         routes: {
           '/login': (context) => LoginPage(),
           '/register': (context) => RegisterPage(),
           '/forgot-password': (context) => ForgotPasswordPage(),
           '/home': (context) => MyHomePage(title: 'Today'),
+          '/shop':(context) => ShopScreen(),
         },
         );
   }
