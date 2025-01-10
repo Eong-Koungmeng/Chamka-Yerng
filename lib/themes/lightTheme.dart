@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 ThemeData buildLightThemeData() {
   return ThemeData(
-    primaryColor: Colors.teal,
+    primaryColor: Colors.green,
     scaffoldBackgroundColor: Colors.grey[100],
     fontFamily: "NotoSans",
     fontFamilyFallback: const ["NotoSansKhmer"],

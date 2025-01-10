@@ -1,3 +1,5 @@
+import 'package:chamka_yerng/screens/forgot_password_screen.dart';
+import 'package:chamka_yerng/screens/register_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -105,7 +107,10 @@ class LoginPage extends StatelessWidget {
               Align(
                 alignment: Alignment.centerLeft,
                 child: TextButton(
-                  onPressed: () => Navigator.pushNamed(context, '/forgot-password'),
+                  onPressed: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => ForgotPasswordPage()),
+                  ),
                   child: Text(
                     'Forgot Password?',
                     style: TextStyle(
@@ -143,7 +148,10 @@ class LoginPage extends StatelessWidget {
                   const SizedBox(width: 10), // Add spacing between the buttons
                   Expanded(
                     child: ElevatedButton(
-                      onPressed: () => Navigator.pushNamed(context, '/register'),
+                      onPressed: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => RegisterPage()),
+                      ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Color(0xFF88C988), // Green background
                         shape: RoundedRectangleBorder(
