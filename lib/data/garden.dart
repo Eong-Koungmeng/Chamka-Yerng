@@ -1,77 +1,102 @@
 import 'dart:convert';
 import 'package:chamka_yerng/data/plant.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 
 class Garden {
-  late final SharedPreferences store;
+  final DatabaseReference databaseRef;
+  final String? userId;
 
-  Garden(this.store);
+  Garden(this.databaseRef, this.userId);
 
   static Future<Garden> load() async {
-    var store = await SharedPreferences.getInstance();
+    DatabaseReference databaseRef = FirebaseDatabase.instance.ref();
+    User? currentUser = FirebaseAuth.instance.currentUser;
 
-    await store.reload();
+    if (currentUser == null) {
+      print('No user is logged in.');
+      return Garden(databaseRef, null);
+    }
 
-    return (Garden(store));
+    String userId = currentUser.uid;
+    return Garden(databaseRef, userId);
   }
 
   Future<List<Plant>> getAllPlants() async {
     List<Plant> allPlants = [];
-    var rawPlants = store.getString("plants");
-    if (rawPlants != null) {
-      Iterable l = json.decode(rawPlants);
-      allPlants = List<Plant>.from(l.map((model) => Plant.fromJson(model)));
+    if (userId == null) {
+      print('User not logged in. Cannot fetch plants.');
+      return allPlants;
+    }
+
+    try {
+      DataSnapshot snapshot = await databaseRef.child('garden/$userId').get();
+      if (snapshot.exists) {
+        Map<String, dynamic> rawData =
+        Map<String, dynamic>.from(snapshot.value as Map);
+        Iterable values = rawData.values;
+        allPlants = List<Plant>.from(values.map((model) => Plant.fromMap(model)));
+      }
+    } catch (e) {
+      print('Error fetching plants: $e');
     }
     return allPlants;
   }
 
-  // Returns true if update
-  // Return false if create
   Future<bool> addOrUpdatePlant(Plant plant) async {
-    List<Plant> allPlants = await getAllPlants();
-    bool status;
-
-    var plantIndex = allPlants.indexWhere((element) => element.id == plant.id);
-    if (plantIndex == -1) {
-      allPlants.add(plant);
-      status = false;
-    } else {
-      allPlants[plantIndex] = plant;
-      status = true;
+    if (userId == null) {
+      print('User not logged in. Cannot add or update plant.');
+      return false;
     }
-    String jsonPlants = jsonEncode(allPlants);
-    await store.setString("plants", jsonPlants);
 
-    return status;
+    try {
+      DatabaseReference plantRef = databaseRef.child('garden/$userId/${plant.id}');
+      DataSnapshot snapshot = await plantRef.get();
+      bool isUpdate = snapshot.exists;
+      await plantRef.set(plant.toMap());
+      return isUpdate;
+    } catch (e) {
+      print('Error adding or updating plant: $e');
+      return false;
+    }
   }
 
   Future<bool> deletePlant(Plant plant) async {
-    List<Plant> allPlants = await getAllPlants();
+    if (userId == null) {
+      print('User not logged in. Cannot delete plant.');
+      return false;
+    }
 
-    var plantIndex = allPlants.indexWhere((element) => element.id == plant.id);
-    if (plantIndex != -1) {
-      allPlants.removeAt(plantIndex);
-
-      String jsonPlants = jsonEncode(allPlants);
-      await store.setString("plants", jsonPlants);
-
-      return true;
-    } else {
+    try {
+      DatabaseReference plantRef = databaseRef.child('garden/$userId/${plant.id}');
+      DataSnapshot snapshot = await plantRef.get();
+      if (snapshot.exists) {
+        await plantRef.remove();
+        return true;
+      }
+      return false;
+    } catch (e) {
+      print('Error deleting plant: $e');
       return false;
     }
   }
 
   Future<bool> updatePlant(Plant plant) async {
-    List<Plant> allPlants = await getAllPlants();
+    if (userId == null) {
+      print('User not logged in. Cannot update plant.');
+      return false;
+    }
 
-    var plantIndex = allPlants.indexWhere((element) => element.id == plant.id);
-    if (plantIndex != -1) {
-      allPlants[plantIndex] = plant;
-
-      String jsonPlants = jsonEncode(allPlants);
-      await store.setString("plants", jsonPlants);
-      return true;
-    } else {
+    try {
+      DatabaseReference plantRef = databaseRef.child('garden/$userId/${plant.id}');
+      DataSnapshot snapshot = await plantRef.get();
+      if (snapshot.exists) {
+        await plantRef.set(plant.toMap());
+        return true;
+      }
+      return false;
+    } catch (e) {
+      print('Error updating plant: $e');
       return false;
     }
   }

@@ -15,6 +15,7 @@ import 'package:intl/intl.dart';
 import 'package:responsive_grid_list/responsive_grid_list.dart';
 import '../data/care.dart';
 import '../data/default.dart';
+import '../data/garden.dart';
 import '../main.dart';
 import 'manage_plant.dart';
 import 'care_plant.dart';
@@ -356,6 +357,7 @@ class _MyHomePageState extends State<MyHomePage> {
     List<Plant> plants = [];
     Map<String, List<String>> cares = {};
 
+    garden = await Garden.load();
     List<Plant> allPlants = await garden.getAllPlants();
     DateTime dateCheck = _dateFilterEnabled ? _dateFilter : DateTime.now();
 

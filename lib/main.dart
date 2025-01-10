@@ -23,8 +23,8 @@ late Garden garden;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  garden = await Garden.load();
   await Firebase.initializeApp();
+  garden = await Garden.load();
 
   final appSettings = AppSettings();
   await appSettings.loadPreferences();
