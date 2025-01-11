@@ -108,7 +108,7 @@ class _MyHomePageState extends State<MyHomePage> {
         }
       }
 
-      print("foreground florae detected plants " + plants.join(' '));
+      print("foreground detected plants " + plants.join(' '));
 
       if (plants.isNotEmpty) {
         notify.singleNotification(
@@ -479,7 +479,7 @@ class _MyHomePageState extends State<MyHomePage> {
               children: <Widget>[
                 AspectRatio(
                   aspectRatio: 18 / 12,
-                  child: plant.picture!.contains("florae_avatar")
+                  child: plant.picture!.contains("avatar")
                       ? Image.asset(
                           plant.picture!,
                           fit: BoxFit.fitHeight,

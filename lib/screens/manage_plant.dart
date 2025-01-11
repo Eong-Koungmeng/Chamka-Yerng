@@ -136,7 +136,7 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
       descriptionController.text = widget.plant!.description;
       locationController.text = widget.plant!.location ?? "";
 
-      if (widget.plant!.picture!.contains("florae_avatar")) {
+      if (widget.plant!.picture!.contains("avatar")) {
         String? asset =
             widget.plant!.picture!.replaceAll(RegExp(r'\D'), ''); // '23'
         _prefNumber = int.tryParse(asset) ?? 1;
@@ -226,7 +226,7 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
                         height: 200,
                         child: _image == null
                             ? Image.asset(
-                                "assets/florae_avatar_$_prefNumber.png",
+                                "assets/avatar_$_prefNumber.png",
                                 fit: BoxFit.fitWidth,
                               )
                             : Image.file(File(_image!.path)),
@@ -388,7 +388,7 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
                 description: descriptionController.text,
                 picture: _image != null
                     ? fileName
-                    : "assets/florae_avatar_$_prefNumber.png",
+                    : "assets/avatar_$_prefNumber.png",
                 location: locationController.text,
                 cares: []);
 
