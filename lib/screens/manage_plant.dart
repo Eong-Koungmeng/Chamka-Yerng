@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:chamka_yerng/data/default.dart';
@@ -14,6 +15,8 @@ import 'package:intl/intl.dart';
 import '../data/care.dart';
 import '../main.dart';
 import '../utils/random.dart';
+
+import 'package:http/http.dart' as http;
 
 class ManagePlantScreen extends StatefulWidget {
   const ManagePlantScreen(
@@ -45,6 +48,45 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
 
   XFile? _image;
   int _prefNumber = 1;
+
+  final String cloudName = "dyzvp6wsh";
+  final String uploadPreset = "pxmjjkdg";
+
+  Future<String?> _uploadImageToCloudinary(String imagePath, {bool isAsset = false}) async {
+    try {
+      final url = Uri.parse("https://api.cloudinary.com/v1_1/$cloudName/image/upload");
+      late http.MultipartFile imageFile;
+
+      if (isAsset) {
+        // Load asset image as bytes
+        final byteData = await rootBundle.load(imagePath);
+        final tempDir = await getTemporaryDirectory();
+        final tempFile = File('${tempDir.path}/temp_avatar.png');
+        await tempFile.writeAsBytes(byteData.buffer.asUint8List());
+        imageFile = await http.MultipartFile.fromPath('file', tempFile.path);
+      } else {
+        imageFile = await http.MultipartFile.fromPath('file', imagePath);
+      }
+
+      final request = http.MultipartRequest("POST", url)
+        ..fields['upload_preset'] = uploadPreset
+        ..files.add(imageFile);
+
+      final response = await request.send();
+
+      if (response.statusCode == 200) {
+        final responseData = await response.stream.bytesToString();
+        final jsonResponse = json.decode(responseData);
+        return jsonResponse['secure_url'];
+      } else {
+        print("Failed to upload image: ${response.reasonPhrase}");
+        return null;
+      }
+    } catch (e) {
+      print("Error uploading image to Cloudinary: $e");
+      return null;
+    }
+  }
 
   Future getImageFromCam() async {
     var image =
@@ -364,47 +406,51 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () async {
-          String fileName = "";
-          String generatedId = generateRandomString(10);
           if (_formKey.currentState!.validate()) {
+            String? uploadedImageUrl;
+
             if (_image != null) {
-              final Directory directory = await getExternalStorageDirectory() ??
-                  await getApplicationDocumentsDirectory();
-              fileName = directory.path +
-                  "/" +
-                  generatedId +
-                  p.extension(_image!.path);
-              _image!.saveTo(fileName);
+              // Upload camera/gallery image
+              uploadedImageUrl = await _uploadImageToCloudinary(_image!.path);
+            } else {
+              // Upload avatar asset
+              uploadedImageUrl = await _uploadImageToCloudinary(
+                  "assets/avatar_$_prefNumber.png",
+                  isAsset: true
+              );
             }
 
-            // Creates new plant object with previous id if we are editing
-            // or generates a Id if we are creating a new plant
+            if (uploadedImageUrl == null) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text("errorUploadingImage"),
+              ));
+              return;
+            }
+
             final newPlant = Plant(
-                id: widget.plant != null
-                    ? widget.plant!.id
-                    : generatedId.hashCode,
-                name: nameController.text,
-                createdAt: _planted,
-                description: descriptionController.text,
-                picture: _image != null
-                    ? fileName
-                    : "assets/avatar_$_prefNumber.png",
-                location: locationController.text,
-                cares: []);
+              id: widget.plant != null ? widget.plant!.id : generateRandomString(10).hashCode,
+              name: nameController.text,
+              createdAt: _planted,
+              description: descriptionController.text,
+              picture: uploadedImageUrl, // Always use the Cloudinary URL
+              location: locationController.text,
+              cares: [],
+            );
 
-            // Assign cares to plant
+            // Assign cares to the plant
             newPlant.cares.clear();
-
             cares.forEach((key, value) {
               if (value.cycles != 0) {
                 newPlant.cares.add(Care(
-                    cycles: value.cycles,
-                    effected: value.effected,
-                    name: key,
-                    id: key.hashCode));
+                  cycles: value.cycles,
+                  effected: value.effected,
+                  name: key,
+                  id: key.hashCode,
+                ));
               }
             });
 
+            // Save the plant
             await garden.addOrUpdatePlant(newPlant);
 
             Navigator.popUntil(context, ModalRoute.withName('/'));

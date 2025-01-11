@@ -479,15 +479,30 @@ class _MyHomePageState extends State<MyHomePage> {
               children: <Widget>[
                 AspectRatio(
                   aspectRatio: 18 / 12,
-                  child: plant.picture!.contains("avatar")
-                      ? Image.asset(
-                          plant.picture!,
-                          fit: BoxFit.fitHeight,
-                        )
-                      : Image.file(
-                          File(plant.picture!),
-                          fit: BoxFit.fitWidth,
+                  child: plant.picture!.isNotEmpty
+                      ? Image.network(
+                    plant.picture!,
+                    fit: BoxFit.cover, // Adjusts how the image fits the widget
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return Center(
+                        child: CircularProgressIndicator(
+                          value: loadingProgress.expectedTotalBytes != null
+                              ? loadingProgress.cumulativeBytesLoaded /
+                              (loadingProgress.expectedTotalBytes ?? 1)
+                              : null,
                         ),
+                      );
+                    },
+                    errorBuilder: (context, error, stackTrace) {
+                      return const Icon(
+                        Icons.error,
+                        size: 50,
+                        color: Colors.red,
+                      );
+                    },
+                  )
+                      : const Text("No image URL provided."),
                 ),
                 Expanded(
                   child: Padding(
