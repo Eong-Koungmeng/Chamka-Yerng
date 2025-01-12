@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:background_fetch/background_fetch.dart';
+import 'package:chamka_yerng/screens/shop_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -117,7 +118,6 @@ class _MyHomePageState extends State<MyHomePage> {
       }
 
       print("foreground florae detected plants " + plants.join(' '));
-
       if (plants.isNotEmpty) {
         notify.singleNotification(
             AppLocalizations.of(context)!.careNotificationTitle,
@@ -178,11 +178,11 @@ class _MyHomePageState extends State<MyHomePage> {
             SvgPicture.asset(
               _currentPage == Page.today
                   ? (Theme.of(context).brightness == Brightness.dark)
-                      ? "assets/undraw_different_love_a-3-rg.svg"
-                      : "assets/undraw_fall_thyk.svg"
+                  ? "assets/undraw_different_love_a-3-rg.svg"
+                  : "assets/undraw_fall_thyk.svg"
                   : (Theme.of(context).brightness == Brightness.dark)
-                      ? "assets/undraw_flowers_vx06.svg"
-                      : "assets/undraw_blooming_re_2kc4.svg",
+                  ? "assets/undraw_flowers_vx06.svg"
+                  : "assets/undraw_blooming_re_2kc4.svg",
               semanticsLabel: 'Fall',
               alignment: Alignment.center,
               height: 250,
@@ -212,11 +212,13 @@ class _MyHomePageState extends State<MyHomePage> {
   String titleSelector() {
     if (_dateFilterEnabled) {
       return DateFormat.EEEE(Localizations.localeOf(context).languageCode)
-              .format(_dateFilter) +
+          .format(_dateFilter) +
           " " +
           DateFormat('d').format(_dateFilter);
     } else if (_currentPage == Page.garden) {
       return AppLocalizations.of(context)!.buttonGarden;
+    } else if(_currentPage==Page.shop){
+      return AppLocalizations.of(context)!.buttonShop;
     } else {
       return AppLocalizations.of(context)!.buttonToday;
     }
@@ -232,7 +234,6 @@ class _MyHomePageState extends State<MyHomePage> {
     // than having to individually change instances of widgets.
 
     String title = titleSelector();
-
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
@@ -244,37 +245,37 @@ class _MyHomePageState extends State<MyHomePage> {
         actions: <Widget>[
           _currentPage == Page.today
               ? IconButton(
-                  icon: const Icon(Icons.checklist_rounded),
-                  iconSize: 25,
-                  color: Theme.of(context).colorScheme.primary,
-                  tooltip: AppLocalizations.of(context)!.tooltipCareAll,
-                  onPressed: () {
-                    _showWaterAllPlantsDialog();
-                  },
-                )
+            icon: const Icon(Icons.checklist_rounded),
+            iconSize: 25,
+            color: Theme.of(context).colorScheme.primary,
+            tooltip: AppLocalizations.of(context)!.tooltipCareAll,
+            onPressed: () {
+              _showWaterAllPlantsDialog();
+            },
+          )
               : const SizedBox.shrink(),
           _currentPage == Page.today
               ? IconButton(
-                  icon: const Icon(Icons.calendar_today),
-                  iconSize: 25,
-                  color: Theme.of(context).colorScheme.primary,
-                  tooltip: AppLocalizations.of(context)!.tooltipShowCalendar,
-                  onPressed: () async {
-                    DateTime? result = await showDatePicker(
-                        context: context,
-                        initialDate:
-                            DateTime.now().add(const Duration(days: 1)),
-                        firstDate: DateTime.now().add(const Duration(days: 1)),
-                        lastDate: DateTime.now().add(const Duration(days: 7)));
-                    setState(() {
-                      var time = TimeOfDay.now();
-                      _dateFilter = result!.add(
-                          Duration(hours: time.hour, minutes: time.minute));
-                      _dateFilterEnabled = true;
-                      _loadPlants();
-                                        });
-                  },
-                )
+            icon: const Icon(Icons.calendar_today),
+            iconSize: 25,
+            color: Theme.of(context).colorScheme.primary,
+            tooltip: AppLocalizations.of(context)!.tooltipShowCalendar,
+            onPressed: () async {
+              DateTime? result = await showDatePicker(
+                  context: context,
+                  initialDate:
+                  DateTime.now().add(const Duration(days: 1)),
+                  firstDate: DateTime.now().add(const Duration(days: 1)),
+                  lastDate: DateTime.now().add(const Duration(days: 7)));
+              setState(() {
+                var time = TimeOfDay.now();
+                _dateFilter = result!.add(
+                    Duration(hours: time.hour, minutes: time.minute));
+                _dateFilterEnabled = true;
+                _loadPlants();
+              });
+            },
+          )
               : const SizedBox.shrink(),
           IconButton(
             icon: const Icon(Icons.settings),
@@ -286,7 +287,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   context,
                   MaterialPageRoute<void>(
                     builder: (context) =>
-                        const SettingsScreen(title: "Settings Screen"),
+                    const SettingsScreen(title: "Settings Screen"),
                   ));
             },
           ),
@@ -295,25 +296,20 @@ class _MyHomePageState extends State<MyHomePage> {
         iconTheme: const IconThemeData(color: Colors.white),
         elevation: 0.0,
       ),
-      body: _plants.isEmpty
+      body: _plants.isEmpty && _currentPage != Page.shop  // Add condition for shop page
           ? noPlants()
+          : _currentPage == Page.shop  // Add shop page condition
+          ? ShopScreen()  // Show shop screen when shop is selected
           : ResponsiveGridList(
-              // Horizontal space between grid items
-              horizontalGridSpacing: 10,
-              // Vertical space between grid items
-              verticalGridSpacing: 10,
-              // Horizontal space around the grid
-              horizontalGridMargin: 10,
-              // Vertical space around the grid
-              verticalGridMargin: 10,
-              // The minimum item width (can be smaller, if the layout constraints are smaller)
-              minItemWidth: 150,
-              // The minimum items to show in a single row. Takes precedence over minItemWidth
-              minItemsPerRow: 2,
-              // The maximum items to show in a single row. Can be useful on large screens
-              maxItemsPerRow: 6,
-              children: _buildPlantCards(context) // Changed code
-              ),
+          horizontalGridSpacing: 10,
+          verticalGridSpacing: 10,
+          horizontalGridMargin: 10,
+          verticalGridMargin: 10,
+          minItemWidth: 150,
+          minItemsPerRow: 2,
+          maxItemsPerRow: 6,
+          children: _buildPlantCards(context)
+      ),
       bottomNavigationBar: NavigationBar(
         onDestinationSelected: (int index) {
           setState(() {
@@ -326,13 +322,13 @@ class _MyHomePageState extends State<MyHomePage> {
         destinations: <Widget>[
           NavigationDestination(
             selectedIcon:
-                Icon(Icons.eco, color: Theme.of(context).colorScheme.surface),
+            Icon(Icons.eco, color: Theme.of(context).colorScheme.surface),
             icon: const Icon(Icons.eco_outlined),
             label: AppLocalizations.of(context)!.buttonToday,
           ),
           NavigationDestination(
             selectedIcon:
-                Icon(Icons.grass, color: Theme.of(context).colorScheme.surface),
+            Icon(Icons.grass, color: Theme.of(context).colorScheme.surface),
             icon: const Icon(Icons.grass_outlined),
             label: AppLocalizations.of(context)!.buttonGarden,
           ),
@@ -474,7 +470,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   List<GestureDetector> _buildPlantCards(BuildContext context) {
     final ThemeData theme = Theme.of(context);
-
     return _plants.map((plant) {
       return GestureDetector(
           onLongPressCancel: () async {
@@ -493,13 +488,13 @@ class _MyHomePageState extends State<MyHomePage> {
                   aspectRatio: 18 / 12,
                   child: plant.picture!.contains("florae_avatar")
                       ? Image.asset(
-                          plant.picture!,
-                          fit: BoxFit.fitHeight,
-                        )
+                    plant.picture!,
+                    fit: BoxFit.fitHeight,
+                  )
                       : Image.file(
-                          File(plant.picture!),
-                          fit: BoxFit.fitWidth,
-                        ),
+                    File(plant.picture!),
+                    fit: BoxFit.fitWidth,
+                  ),
                 ),
                 Expanded(
                   child: Padding(
@@ -527,8 +522,8 @@ class _MyHomePageState extends State<MyHomePage> {
                               alignment: Alignment.centerLeft,
                               child: plant.cares.isNotEmpty
                                   ? Row(
-                                      mainAxisSize: MainAxisSize.max,
-                                      children: _buildCares(context, plant))
+                                  mainAxisSize: MainAxisSize.max,
+                                  children: _buildCares(context, plant))
                                   : null,
                             )),
                       ],

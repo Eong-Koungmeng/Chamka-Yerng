@@ -1,68 +1,92 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../data/shop_item.dart';
 import 'add_shop_item_screen.dart';
 
-class ShopScreen extends StatelessWidget {
+class ShopItem {
+  final String name;
+  final String image;
+  final double price;
+
+  ShopItem({required this.name, required this.image, required this.price});
+}
+
+class ShopScreen extends StatefulWidget {
+  @override
+  _ShopScreenState createState() => _ShopScreenState();
+}
+
+class _ShopScreenState extends State<ShopScreen> {
+  final List<ShopItem> shopItems = [];
+
+  void addNewItem(GardenItem newItem) {
+    setState(() {
+      shopItems.add(
+        ShopItem(
+          name: newItem.name,
+          image: newItem.image,
+          price: newItem.price,
+        ),
+      );
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    final shopData = Provider.of<ShopData>(context);
-    final items = shopData.items;
-
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Shop'),
+        title: const Text("Shop"),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.add),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => AddShopItemScreen(
+                    onAddItem: (GardenItem newItem) {
+                      addNewItem(newItem);
+                    },
+                  ),
+                ),
+              );
+            },
+          ),
+        ],
       ),
-      body: items.isEmpty
-          ? const Center(
-        child: Text(
-          'No items in the shop yet!',
-          style: TextStyle(fontSize: 18),
-        ),
-      )
+      body: shopItems.isEmpty
+          ? const Center(child: Text("No items in the shop yet!"))
           : GridView.builder(
-        padding: const EdgeInsets.all(10),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
-          childAspectRatio: 3 / 2,
-          crossAxisSpacing: 10,
           mainAxisSpacing: 10,
+          crossAxisSpacing: 10,
+          childAspectRatio: 2 / 3,
         ),
-        itemCount: items.length,
-        itemBuilder: (ctx, index) {
-          final item = items[index];
+        itemCount: shopItems.length,
+        itemBuilder: (context, index) {
+          final item = shopItems[index];
           return Card(
+            elevation: 5,
             child: Column(
               children: [
-                Image.network(
-                  item.imageUrl,
-                  height: 100,
-                  fit: BoxFit.cover,
+                Expanded(
+                  child: Image.asset(item.image, fit: BoxFit.cover),
                 ),
-                Text(item.name),
-                Text('\$${item.price.toStringAsFixed(2)}'),
-                ElevatedButton(
-                  onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Bought ${item.name}!')),
-                    );
-                  },
-                  child: const Text('Buy'),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    item.name,
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text("\$${item.price.toStringAsFixed(2)}"),
                 ),
               ],
             ),
           );
         },
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(builder: (ctx) => AddShopItemScreen()),
-          );
-        },
-        child: const Icon(Icons.add),
-      ),
     );
   }
 }
-

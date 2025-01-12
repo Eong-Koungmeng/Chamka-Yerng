@@ -12,15 +12,18 @@ class Plant {
   DateTime createdAt;
   String? picture;
   List<Care> cares = [];
+  bool forSale; // New property
 
-  Plant(
-      {required this.name,
-      this.id = 0,
-      this.location,
-      this.description = "",
-      required this.createdAt,
-      this.picture,
-      required this.cares});
+  Plant({
+    required this.name,
+    this.id = 0,
+    this.location,
+    this.description = "",
+    required this.createdAt,
+    this.picture,
+    required this.cares,
+    this.forSale = false, // Default value
+  });
 
   factory Plant.fromJson(Map<String, dynamic> json) => _$PlantFromJson(json);
 
