@@ -3,8 +3,10 @@ import 'dart:io';
 
 import 'package:chamka_yerng/data/default.dart';
 import 'package:chamka_yerng/data/plant.dart';
+import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -54,11 +56,24 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
 
   Future<String?> _uploadImageToCloudinary(String imagePath, {bool isAsset = false}) async {
     try {
-      final url = Uri.parse("https://api.cloudinary.com/v1_1/$cloudName/image/upload");
-      late http.MultipartFile imageFile;
+      // Cloudinary credentials
+      final String cloudName = dotenv.env['CLOUDINARY_CLOUD_NAME'] ?? '';
+      final String apiKey = dotenv.env['CLOUDINARY_API_KEY'] ?? '';
+      final String apiSecret = dotenv.env['CLOUDINARY_API_SECRET'] ?? '';
+      const String uploadFolder = "public"; // Optional folder
 
+      // Step 1: Generate a timestamp
+      final int timestamp = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+
+      // Step 2: Create the string to sign
+      final String stringToSign = "folder=$uploadFolder&timestamp=$timestamp$apiSecret";
+
+      // Step 3: Generate the signature using HMAC SHA-1
+      final signature = sha1.convert(utf8.encode(stringToSign)).toString();
+
+      // Step 4: Prepare the image file
+      late http.MultipartFile imageFile;
       if (isAsset) {
-        // Load asset image as bytes
         final byteData = await rootBundle.load(imagePath);
         final tempDir = await getTemporaryDirectory();
         final tempFile = File('${tempDir.path}/temp_avatar.png');
@@ -68,8 +83,13 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
         imageFile = await http.MultipartFile.fromPath('file', imagePath);
       }
 
+      // Step 5: Send the signed request to Cloudinary
+      final url = Uri.parse("https://api.cloudinary.com/v1_1/$cloudName/image/upload");
       final request = http.MultipartRequest("POST", url)
-        ..fields['upload_preset'] = uploadPreset
+        ..fields['api_key'] = apiKey
+        ..fields['timestamp'] = timestamp.toString()
+        ..fields['signature'] = signature
+        ..fields['folder'] = uploadFolder
         ..files.add(imageFile);
 
       final response = await request.send();
@@ -90,7 +110,7 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
 
   Future getImageFromCam() async {
     var image =
-        await _picker.pickImage(source: ImageSource.camera, imageQuality: 25);
+    await _picker.pickImage(source: ImageSource.camera, imageQuality: 25);
     setState(() {
       _image = image;
     });
@@ -98,7 +118,7 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
 
   Future getImageFromGallery() async {
     var image =
-        await _picker.pickImage(source: ImageSource.gallery, imageQuality: 25);
+    await _picker.pickImage(source: ImageSource.gallery, imageQuality: 25);
     setState(() {
       _image = image;
     });
@@ -180,7 +200,7 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
 
       if (widget.plant!.picture!.contains("avatar")) {
         String? asset =
-            widget.plant!.picture!.replaceAll(RegExp(r'\D'), ''); // '23'
+        widget.plant!.picture!.replaceAll(RegExp(r'\D'), ''); // '23'
         _prefNumber = int.tryParse(asset) ?? 1;
       } else {
         _image = XFile(widget.plant!.picture!);
@@ -220,7 +240,7 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
               '${value.translatedName} ${AppLocalizations.of(context)!.every}'),
           subtitle: cares[key]!.cycles != 0
               ? Text(cares[key]!.cycles.toString() +
-                  " ${AppLocalizations.of(context)!.days}")
+              " ${AppLocalizations.of(context)!.days}")
               : Text(AppLocalizations.of(context)!.never),
           onTap: () {
             _showIntegerDialog(key);
@@ -260,67 +280,67 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
                 elevation: 2,
                 child: SizedBox(
                     child: Column(
-                  children: <Widget>[
-                    const SizedBox(height: 10),
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(20.0), //or 15.0
-                      child: SizedBox(
-                        height: 200,
-                        child: _image == null
-                            ? Image.asset(
+                      children: <Widget>[
+                        const SizedBox(height: 10),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(20.0), //or 15.0
+                          child: SizedBox(
+                              height: 200,
+                              child: _image == null
+                                  ? Image.asset(
                                 "assets/avatar_$_prefNumber.png",
                                 fit: BoxFit.fitWidth,
                               )
-                            : Image.network(
-                          _image!.path,
-                          fit: BoxFit.cover, // Adjusts how the image fits the widget
-                          loadingBuilder: (context, child, loadingProgress) {
-                            if (loadingProgress == null) return child;
-                            return Center(
-                              child: CircularProgressIndicator(
-                                value: loadingProgress.expectedTotalBytes != null
-                                    ? loadingProgress.cumulativeBytesLoaded /
-                                    (loadingProgress.expectedTotalBytes ?? 1)
-                                    : null,
-                              ),
-                            );
-                          },
-                          errorBuilder: (context, error, stackTrace) {
-                            return const Icon(
-                              Icons.error,
-                              size: 50,
-                              color: Colors.red,
-                            );
-                          },
-                        )
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: <Widget>[
-                        IconButton(
-                          onPressed: getImageFromCam,
-                          icon: const Icon(Icons.add_a_photo),
-                          tooltip:
-                              AppLocalizations.of(context)!.tooltipCameraImage,
+                                  : Image.network(
+                                _image!.path,
+                                fit: BoxFit.cover, // Adjusts how the image fits the widget
+                                loadingBuilder: (context, child, loadingProgress) {
+                                  if (loadingProgress == null) return child;
+                                  return Center(
+                                    child: CircularProgressIndicator(
+                                      value: loadingProgress.expectedTotalBytes != null
+                                          ? loadingProgress.cumulativeBytesLoaded /
+                                          (loadingProgress.expectedTotalBytes ?? 1)
+                                          : null,
+                                    ),
+                                  );
+                                },
+                                errorBuilder: (context, error, stackTrace) {
+                                  return const Icon(
+                                    Icons.error,
+                                    size: 50,
+                                    color: Colors.red,
+                                  );
+                                },
+                              )
+                          ),
                         ),
-                        IconButton(
-                            onPressed: getPrefabImage,
-                            icon: const Icon(Icons.refresh),
-                            tooltip: AppLocalizations.of(context)!
-                                .tooltipNextAvatar),
-                        IconButton(
-                          onPressed: getImageFromGallery,
-                          icon: const Icon(Icons.wallpaper),
-                          tooltip:
+                        const SizedBox(height: 10),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: <Widget>[
+                            IconButton(
+                              onPressed: getImageFromCam,
+                              icon: const Icon(Icons.add_a_photo),
+                              tooltip:
+                              AppLocalizations.of(context)!.tooltipCameraImage,
+                            ),
+                            IconButton(
+                                onPressed: getPrefabImage,
+                                icon: const Icon(Icons.refresh),
+                                tooltip: AppLocalizations.of(context)!
+                                    .tooltipNextAvatar),
+                            IconButton(
+                              onPressed: getImageFromGallery,
+                              icon: const Icon(Icons.wallpaper),
+                              tooltip:
                               AppLocalizations.of(context)!.tooltipGalleryImage,
-                        )
+                            )
+                          ],
+                        ),
+                        const SizedBox(height: 10),
                       ],
-                    ),
-                    const SizedBox(height: 10),
-                  ],
-                )),
+                    )),
               ),
               Card(
                 semanticContainer: true,
@@ -365,7 +385,7 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
                         decoration: InputDecoration(
                           icon: const Icon(Icons.topic),
                           labelText:
-                              AppLocalizations.of(context)!.labelDescription,
+                          AppLocalizations.of(context)!.labelDescription,
                         ),
                       ),
                       TextFormField(
@@ -375,9 +395,9 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
                         decoration: InputDecoration(
                           icon: const Icon(Icons.location_on),
                           labelText:
-                              AppLocalizations.of(context)!.labelLocation,
+                          AppLocalizations.of(context)!.labelLocation,
                           helperText:
-                              AppLocalizations.of(context)!.exampleLocation,
+                          AppLocalizations.of(context)!.exampleLocation,
                         ),
                       ),
                     ]),
@@ -406,7 +426,7 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
                   enabled: !widget.update,
                   title: Text(AppLocalizations.of(context)!.labelDayPlanted),
                   subtitle: Text(DateFormat.yMMMMEEEEd(
-                          Localizations.localeOf(context).languageCode)
+                      Localizations.localeOf(context).languageCode)
                       .format(_planted)),
                   onTap: () async {
                     DateTime? result = await showDatePicker(
@@ -443,8 +463,8 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
 
             if (uploadedImageUrl == null) {
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text("errorUploadingImage"),
-              ));
+                  SnackBar(content: Text("errorUploadingImage"),
+                  ));
               return;
             }
 

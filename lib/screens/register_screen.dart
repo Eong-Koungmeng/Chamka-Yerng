@@ -2,7 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 
-import '../model/user_model.dart';
+import '../data/user_model.dart';
 import 'home_page.dart';
 
 class RegisterPage extends StatelessWidget {
