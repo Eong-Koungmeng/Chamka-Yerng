@@ -45,27 +45,29 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   @override
+  @override
   void initState() {
     super.initState();
-    _loadPlants();
-    initializeDateFormatting();
+
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
     initPlatformState();
   }
 
   Future<void> initPlatformState() async {
     if (!mounted) return;
 
-    // Access provider data safely without triggering rebuilds
     final appSettings = context.read<AppSettings>();
     final int notificationTempo = appSettings.notifcationTempo ?? 60;
 
-    // Initialize notifications
     notify.initNotifications(
       AppLocalizations.of(context)!.careNotificationName,
       AppLocalizations.of(context)!.careNotificationDescription,
     );
 
-    // Configure BackgroundFetch
     try {
       var status = await BackgroundFetch.configure(
         BackgroundFetchConfig(

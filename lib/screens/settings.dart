@@ -89,13 +89,6 @@ class _SettingsScreen extends State<SettingsScreen> {
                     notificationTempo = parsedMinutes;
                   });
 
-                  // Update provider and shared preferences
-                  final appSettings = context.read<AppSettings>();
-                  await appSettings.updateNotificationTempo(notificationTempo);
-
-                  final prefs = await SharedPreferences.getInstance();
-                  await prefs.setInt('notificationTempo', notificationTempo);
-
                   Navigator.of(context).pop();
                 },
               ),
@@ -232,7 +225,8 @@ class _SettingsScreen extends State<SettingsScreen> {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () async {
           final prefs = await SharedPreferences.getInstance();
-          await prefs.setInt('notificationTempo', notificationTempo);
+          final appSettings = context.read<AppSettings>();
+          await appSettings.updateNotificationTempo(notificationTempo);
           Navigator.pop(context);
         },
         label: Text(AppLocalizations.of(context)!.saveButton),
