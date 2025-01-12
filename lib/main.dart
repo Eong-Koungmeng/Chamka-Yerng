@@ -33,6 +33,7 @@ void main() async {
 
   final currentUser = FirebaseAuth.instance.currentUser;
 
+  print("hello");
   runApp(
     ChangeNotifierProvider(
       create: (_) => appSettings,
@@ -46,6 +47,8 @@ void main() async {
 /// This "Headless Task" is run when app is terminated.
 @pragma('vm:entry-point')
 void backgroundFetchHeadlessTask(HeadlessTask task) async {
+  await Firebase.initializeApp();
+  await dotenv.load(fileName: ".env");
   var taskId = task.taskId;
   var timeout = task.timeout;
   if (timeout) {
@@ -54,6 +57,7 @@ void backgroundFetchHeadlessTask(HeadlessTask task) async {
     return;
   }
 
+  print("helllllo");
   print("[BackgroundFetch] Headless event received: $taskId");
 
   Garden gr = await Garden.load();

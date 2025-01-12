@@ -47,7 +47,7 @@
   "spray": "Spray",
   "testNotificationBody": "This is a test message",
   "testNotificationButton": "តែស្តការរំលឹក",
-  "testNotificationTitle": "Florae Test Notification",
+  "testNotificationTitle": "Test Notification",
   "titleEditPlant": "Edit",
   "titleNewPlant": "New",
   "tooltipCameraImage": "Get image from camera",
@@ -60,5 +60,6 @@
   "tooltipShowCalendar": "Show Calendar",
   "transplant": "Transplant",
   "water": "Water",
-  "yes": "Yes"
+  "yes": "Yes",
+  "minutes": "minutes"
 }

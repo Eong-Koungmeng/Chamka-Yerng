@@ -106,6 +106,7 @@ class _MyHomePageState extends State<MyHomePage> {
           }
           break;
         }
+
       }
 
       print("foreground detected plants " + plants.join(' '));

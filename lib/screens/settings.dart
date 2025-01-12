@@ -43,7 +43,7 @@ class _SettingsScreen extends State<SettingsScreen> {
   void _showIntegerDialog() async {
     FocusManager.instance.primaryFocus?.unfocus();
 
-    String tempHoursValue = "";
+    String tempMinutesValue = "";
 
     await showDialog<int>(
         context: context,
@@ -53,25 +53,25 @@ class _SettingsScreen extends State<SettingsScreen> {
             content: ListTile(
                 leading: const Icon(Icons.loop),
                 title: TextFormField(
-                  onChanged: (String txt) => tempHoursValue = txt,
+                  onChanged: (String txt) => tempMinutesValue = txt,
                   autofocus: true,
-                  initialValue: (notificationTempo / 60).round().toString(),
+                  initialValue: (notificationTempo).round().toString(),
                   keyboardType: TextInputType.number,
                   inputFormatters: <TextInputFormatter>[
                     FilteringTextInputFormatter.digitsOnly
                   ],
                 ),
-                trailing: Text(AppLocalizations.of(context)!.hours)),
+                trailing: Text(AppLocalizations.of(context)!.minutes)),
             actions: [
               TextButton(
                 child: Text(AppLocalizations.of(context)!.ok),
                 onPressed: () {
                   setState(() {
-                    var parsedHours = int.tryParse(tempHoursValue);
-                    if (parsedHours == null) {
-                      notificationTempo = 1 * 60;
+                    var parsedMinutes = int.tryParse(tempMinutesValue);
+                    if (parsedMinutes == null || parsedMinutes < 15) {
+                      notificationTempo = 15;
                     } else {
-                      notificationTempo = parsedHours * 60;
+                      notificationTempo = parsedMinutes;
                     }
                   });
                   Navigator.of(context).pop();
@@ -130,8 +130,8 @@ class _SettingsScreen extends State<SettingsScreen> {
                     leading: const Icon(Icons.alarm, color: Colors.blue),
                     title: Text(AppLocalizations.of(context)!.notifyEvery),
                     subtitle: notificationTempo != 0
-                        ? Text((notificationTempo / 60).round().toString() +
-                        " ${AppLocalizations.of(context)!.hours}")
+                        ? Text((notificationTempo).round().toString() +
+                        " ${AppLocalizations.of(context)!.minutes}")
                         : Text(AppLocalizations.of(context)!.never),
                     onTap: () {
                       _showIntegerDialog();
