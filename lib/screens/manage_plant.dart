@@ -50,28 +50,40 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
 
   XFile? _image;
   int _prefNumber = 1;
+  bool _imageChanged = false;
 
-  final String cloudName = "dyzvp6wsh";
-  final String uploadPreset = "pxmjjkdg";
+  // Extract public_id from Cloudinary URL
+  String? _getPublicIdFromUrl(String? url) {
+    if (url == null) return null;
 
-  Future<String?> _uploadImageToCloudinary(String imagePath, {bool isAsset = false}) async {
     try {
-      // Cloudinary credentials
+      // URL format: https://res.cloudinary.com/cloud_name/image/upload/v1234567890/public/filename.jpg
+      final uri = Uri.parse(url);
+      final pathSegments = uri.pathSegments;
+
+      // Find the index after 'upload' and get all remaining segments
+      final uploadIndex = pathSegments.indexOf('upload');
+      if (uploadIndex == -1 || uploadIndex + 1 >= pathSegments.length) return null;
+
+      // Join the remaining segments (excluding the version number) with '/'
+      final segments = pathSegments.sublist(uploadIndex + 2); // Skip 'upload' and version
+      return segments.join('/').replaceAll(RegExp(r'\.[^.]+$'), ''); // Remove file extension
+    } catch (e) {
+      print("Error extracting public_id: $e");
+      return null;
+    }
+  }
+
+  Future<String?> _uploadOrReplaceImage(String imagePath, {bool isAsset = false, String? existingUrl}) async {
+    try {
       final String cloudName = dotenv.env['CLOUDINARY_CLOUD_NAME'] ?? '';
       final String apiKey = dotenv.env['CLOUDINARY_API_KEY'] ?? '';
       final String apiSecret = dotenv.env['CLOUDINARY_API_SECRET'] ?? '';
-      const String uploadFolder = "public"; // Optional folder
+      const String uploadFolder = "public";
 
-      // Step 1: Generate a timestamp
       final int timestamp = DateTime.now().millisecondsSinceEpoch ~/ 1000;
 
-      // Step 2: Create the string to sign
-      final String stringToSign = "folder=$uploadFolder&timestamp=$timestamp$apiSecret";
-
-      // Step 3: Generate the signature using HMAC SHA-1
-      final signature = sha1.convert(utf8.encode(stringToSign)).toString();
-
-      // Step 4: Prepare the image file
+      // Prepare the image file
       late http.MultipartFile imageFile;
       if (isAsset) {
         final byteData = await rootBundle.load(imagePath);
@@ -83,14 +95,33 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
         imageFile = await http.MultipartFile.fromPath('file', imagePath);
       }
 
-      // Step 5: Send the signed request to Cloudinary
+      // If we have an existing image URL and this is an update
+      final publicId = widget.update ? _getPublicIdFromUrl(existingUrl) : null;
+
+      // Create signature string based on whether we're updating or creating
+      String stringToSign;
+      if (publicId != null) {
+        stringToSign = "public_id=$publicId&timestamp=$timestamp$apiSecret";
+      } else {
+        stringToSign = "folder=$uploadFolder&timestamp=$timestamp$apiSecret";
+      }
+
+      final signature = sha1.convert(utf8.encode(stringToSign)).toString();
+
+      // Prepare the upload request
       final url = Uri.parse("https://api.cloudinary.com/v1_1/$cloudName/image/upload");
       final request = http.MultipartRequest("POST", url)
         ..fields['api_key'] = apiKey
         ..fields['timestamp'] = timestamp.toString()
         ..fields['signature'] = signature
-        ..fields['folder'] = uploadFolder
         ..files.add(imageFile);
+
+      // Add either public_id for replacement or folder for new upload
+      if (publicId != null) {
+        request.fields['public_id'] = publicId;
+      } else {
+        request.fields['folder'] = uploadFolder;
+      }
 
       final response = await request.send();
 
@@ -99,28 +130,28 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
         final jsonResponse = json.decode(responseData);
         return jsonResponse['secure_url'];
       } else {
-        print("Failed to upload image: ${response.reasonPhrase}");
+        print("Failed to upload/replace image: ${response.reasonPhrase}");
         return null;
       }
     } catch (e) {
-      print("Error uploading image to Cloudinary: $e");
+      print("Error uploading/replacing image: $e");
       return null;
     }
   }
 
   Future getImageFromCam() async {
-    var image =
-    await _picker.pickImage(source: ImageSource.camera, imageQuality: 25);
+    var image = await _picker.pickImage(source: ImageSource.camera, imageQuality: 25);
     setState(() {
       _image = image;
+      _imageChanged = true;
     });
   }
 
   Future getImageFromGallery() async {
-    var image =
-    await _picker.pickImage(source: ImageSource.gallery, imageQuality: 25);
+    var image = await _picker.pickImage(source: ImageSource.gallery, imageQuality: 25);
     setState(() {
       _image = image;
+      _imageChanged = true;
     });
   }
 
@@ -129,11 +160,13 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
       setState(() {
         _image = null;
         _prefNumber++;
+        _imageChanged = true;
       });
     } else {
       setState(() {
         _image = null;
         _prefNumber = 1;
+        _imageChanged = true;
       });
     }
   }
@@ -283,36 +316,48 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
                       children: <Widget>[
                         const SizedBox(height: 10),
                         ClipRRect(
-                          borderRadius: BorderRadius.circular(20.0), //or 15.0
+                          borderRadius: BorderRadius.circular(20.0),
                           child: SizedBox(
-                              height: 200,
-                              child: _image == null
-                                  ? Image.asset(
-                                "assets/avatar_$_prefNumber.png",
-                                fit: BoxFit.fitWidth,
-                              )
-                                  : Image.network(
-                                _image!.path,
-                                fit: BoxFit.cover, // Adjusts how the image fits the widget
-                                loadingBuilder: (context, child, loadingProgress) {
-                                  if (loadingProgress == null) return child;
-                                  return Center(
-                                    child: CircularProgressIndicator(
-                                      value: loadingProgress.expectedTotalBytes != null
-                                          ? loadingProgress.cumulativeBytesLoaded /
-                                          (loadingProgress.expectedTotalBytes ?? 1)
-                                          : null,
-                                    ),
-                                  );
-                                },
-                                errorBuilder: (context, error, stackTrace) {
-                                  return const Icon(
-                                    Icons.error,
-                                    size: 50,
-                                    color: Colors.red,
-                                  );
-                                },
-                              )
+                            height: 200,
+                            child: _image == null
+                                ? Image.asset(
+                              "assets/avatar_$_prefNumber.png",
+                              fit: BoxFit.fitWidth,
+                            )
+                                : widget.update && !_imageChanged
+                                ? Image.network(
+                              _image!.path,
+                              fit: BoxFit.cover,
+                              loadingBuilder: (context, child, loadingProgress) {
+                                if (loadingProgress == null) return child;
+                                return Center(
+                                  child: CircularProgressIndicator(
+                                    value: loadingProgress.expectedTotalBytes != null
+                                        ? loadingProgress.cumulativeBytesLoaded /
+                                        (loadingProgress.expectedTotalBytes ?? 1)
+                                        : null,
+                                  ),
+                                );
+                              },
+                              errorBuilder: (context, error, stackTrace) {
+                                return const Icon(
+                                  Icons.error,
+                                  size: 50,
+                                  color: Colors.red,
+                                );
+                              },
+                            )
+                                : Image.file(
+                              File(_image!.path),
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                return const Icon(
+                                  Icons.error,
+                                  size: 50,
+                                  color: Colors.red,
+                                );
+                              },
+                            ),
                           ),
                         ),
                         const SizedBox(height: 10),
@@ -448,24 +493,30 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () async {
           if (_formKey.currentState!.validate()) {
-            String? uploadedImageUrl;
+            String? imageUrl;
 
-            if (_image != null) {
-              // Upload camera/gallery image
-              uploadedImageUrl = await _uploadImageToCloudinary(_image!.path);
+            if (_imageChanged) {
+              if (_image != null) {
+                imageUrl = await _uploadOrReplaceImage(
+                    _image!.path,
+                    existingUrl: widget.update ? widget.plant!.picture : null
+                );
+              } else {
+                imageUrl = await _uploadOrReplaceImage(
+                    "assets/avatar_$_prefNumber.png",
+                    isAsset: true,
+                    existingUrl: widget.update ? widget.plant!.picture : null
+                );
+              }
+
+              if (imageUrl == null) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text("errorUploadingImage")),
+                );
+                return;
+              }
             } else {
-              // Upload avatar asset
-              uploadedImageUrl = await _uploadImageToCloudinary(
-                  "assets/avatar_$_prefNumber.png",
-                  isAsset: true
-              );
-            }
-
-            if (uploadedImageUrl == null) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text("errorUploadingImage"),
-                  ));
-              return;
+              imageUrl = widget.plant?.picture;
             }
 
             final newPlant = Plant(
@@ -473,7 +524,7 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
               name: nameController.text,
               createdAt: _planted,
               description: descriptionController.text,
-              picture: uploadedImageUrl, // Always use the Cloudinary URL
+              picture: imageUrl,
               location: locationController.text,
               cares: [],
             );
