@@ -70,7 +70,7 @@ class Garden {
 
   Future<bool> _deleteImageFromCloudinary(String imageUrl) async {
     try {
-      // Extract public_id from Cloudinary URL
+
       final uri = Uri.parse(imageUrl);
       final pathSegments = uri.pathSegments;
 
@@ -80,28 +80,23 @@ class Garden {
         return false;
       }
 
-      // Extract public_id (everything after /upload/version/, removing the file extension)
       final publicId = pathSegments
           .sublist(uploadIndex + 2)
           .join('/')
           .replaceAll(RegExp(r'\.[^.]+$'), '');
 
-      // Ensure Cloudinary credentials are defined
       if (cloudName.isEmpty || apiKey.isEmpty || apiSecret.isEmpty) {
         print("Missing Cloudinary credentials");
         return false;
       }
 
-      // Generate timestamp
       final timestamp = DateTime.now().millisecondsSinceEpoch ~/ 1000;
 
-      // Generate signature
       final signaturePayload = 'public_id=$publicId&timestamp=$timestamp${apiSecret}';
       final signature = sha1.convert(utf8.encode(signaturePayload)).toString();
 
       final url = Uri.parse('https://api.cloudinary.com/v1_1/$cloudName/image/destroy');
 
-      // Prepare request body
       final requestBody = {
         'public_id': publicId,
         'timestamp': timestamp.toString(),
@@ -109,7 +104,6 @@ class Garden {
         'signature': signature,
       };
 
-      // Send the HTTP POST request
       final response = await http.post(
         url,
         headers: {'Content-Type': 'application/json'},
@@ -136,7 +130,6 @@ class Garden {
     }
 
     try {
-      // Delete from Firebase
       DatabaseReference plantRef = databaseRef.child('garden/$userId/${plant.id}');
       DataSnapshot snapshot = await plantRef.get();
 
@@ -144,12 +137,10 @@ class Garden {
         return false;
       }
 
-      // Delete image from Cloudinary if it exists and is a Cloudinary URL
       if (plant.picture != null && plant.picture!.contains('cloudinary.com')) {
         await _deleteImageFromCloudinary(plant.picture!);
       }
 
-      // Remove from Firebase
       await plantRef.remove();
       return true;
     } catch (e) {

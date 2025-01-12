@@ -1,5 +1,3 @@
-import 'package:json_annotation/json_annotation.dart';
-
 class Care {
   int id;
   String name;
@@ -13,7 +11,6 @@ class Care {
     this.id = 0,
   });
 
-  /// Factory method to create a `Care` from Firebase data.
   factory Care.fromMap(Map<Object?, Object?> map) {
     return Care(
       id: (map['id'] as num?)?.toInt() ?? 0,
@@ -25,7 +22,6 @@ class Care {
     );
   }
 
-  /// Method to convert `Care` to Firebase-compatible Map.
   Map<String, Object?> toMap() {
     return {
       'id': id,

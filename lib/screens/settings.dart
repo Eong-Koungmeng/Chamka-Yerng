@@ -43,43 +43,67 @@ class _SettingsScreen extends State<SettingsScreen> {
   void _showIntegerDialog() async {
     FocusManager.instance.primaryFocus?.unfocus();
 
-    String tempMinutesValue = "";
+    String tempMinutesValue = notificationTempo.toString();
+    bool isValidInput = true;
 
     await showDialog<int>(
-        context: context,
-        builder: (BuildContext context) {
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(builder: (context, setDialogState) {
           return AlertDialog(
             title: Text(AppLocalizations.of(context)!.selectHours),
-            content: ListTile(
-                leading: const Icon(Icons.loop),
-                title: TextFormField(
-                  onChanged: (String txt) => tempMinutesValue = txt,
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  onChanged: (String txt) {
+                    setDialogState(() {
+                      tempMinutesValue = txt;
+                      isValidInput = int.tryParse(tempMinutesValue) != null &&
+                          int.parse(tempMinutesValue) >= 15;
+                    });
+                  },
                   autofocus: true,
-                  initialValue: (notificationTempo).round().toString(),
                   keyboardType: TextInputType.number,
-                  inputFormatters: <TextInputFormatter>[
-                    FilteringTextInputFormatter.digitsOnly
+                  inputFormatters: [
+                    FilteringTextInputFormatter.digitsOnly,
                   ],
+                  decoration: InputDecoration(
+                    errorText: isValidInput ? null : "minMinutesError",
+                  ),
                 ),
-                trailing: Text(AppLocalizations.of(context)!.minutes)),
+              ],
+            ),
             actions: [
               TextButton(
+                child: Text("cancel"),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+              TextButton(
                 child: Text(AppLocalizations.of(context)!.ok),
-                onPressed: () {
+                onPressed: () async {
+                  if (!isValidInput) return;
+
+                  final parsedMinutes = int.parse(tempMinutesValue);
                   setState(() {
-                    var parsedMinutes = int.tryParse(tempMinutesValue);
-                    if (parsedMinutes == null || parsedMinutes < 15) {
-                      notificationTempo = 15;
-                    } else {
-                      notificationTempo = parsedMinutes;
-                    }
+                    notificationTempo = parsedMinutes;
                   });
+
+                  // Update provider and shared preferences
+                  final appSettings = context.read<AppSettings>();
+                  await appSettings.updateNotificationTempo(notificationTempo);
+
+                  final prefs = await SharedPreferences.getInstance();
+                  await prefs.setInt('notificationTempo', notificationTempo);
+
                   Navigator.of(context).pop();
                 },
-              )
+              ),
             ],
           );
         });
+      },
+    );
   }
 
   Future<void> getSharedPrefs() async {

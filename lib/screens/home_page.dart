@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:background_fetch/background_fetch.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -9,6 +7,7 @@ import 'package:chamka_yerng/notifications.dart' as notify;
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:intl/intl.dart';
@@ -17,6 +16,7 @@ import '../data/care.dart';
 import '../data/default.dart';
 import '../data/garden.dart';
 import '../main.dart';
+import '../provider/app_settings.dart';
 import 'manage_plant.dart';
 import 'care_plant.dart';
 import 'settings.dart';
@@ -48,49 +48,48 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
     _loadPlants();
-
     initializeDateFormatting();
-
     initPlatformState();
   }
 
-  // Platform messages are asynchronous, so we initialize in an async method.
   Future<void> initPlatformState() async {
-    // Configure BackgroundFetch.
-    final prefs = await SharedPreferences.getInstance();
-    final int? notificationTempo = prefs.getInt('notificationTempo');
+    if (!mounted) return;
 
-    notify.initNotifications(AppLocalizations.of(context)!.careNotificationName,
-        AppLocalizations.of(context)!.careNotificationDescription);
+    // Access provider data safely without triggering rebuilds
+    final appSettings = context.read<AppSettings>();
+    final int notificationTempo = appSettings.notifcationTempo ?? 60;
 
+    // Initialize notifications
+    notify.initNotifications(
+      AppLocalizations.of(context)!.careNotificationName,
+      AppLocalizations.of(context)!.careNotificationDescription,
+    );
+
+    // Configure BackgroundFetch
     try {
       var status = await BackgroundFetch.configure(
-          BackgroundFetchConfig(
-              minimumFetchInterval: notificationTempo ?? 60,
-              forceAlarmManager: false,
-              stopOnTerminate: false,
-              startOnBoot: true,
-              enableHeadless: true,
-              requiresBatteryNotLow: false,
-              requiresCharging: false,
-              requiresStorageNotLow: false,
-              requiresDeviceIdle: false,
-              requiredNetworkType: NetworkType.NONE),
-          _onBackgroundFetch,
-          _onBackgroundFetchTimeout);
+        BackgroundFetchConfig(
+          minimumFetchInterval: notificationTempo,
+          forceAlarmManager: false,
+          stopOnTerminate: false,
+          startOnBoot: true,
+          enableHeadless: true,
+          requiresBatteryNotLow: false,
+          requiresCharging: false,
+          requiresStorageNotLow: false,
+          requiresDeviceIdle: false,
+          requiredNetworkType: NetworkType.NONE,
+        ),
+        _onBackgroundFetch,
+        _onBackgroundFetchTimeout,
+      );
       print('[BackgroundFetch] configure success: $status');
-    } on Exception catch (e) {
+    } catch (e) {
       print("[BackgroundFetch] configure ERROR: $e");
     }
-
-    // If the widget was removed from the tree while the asynchronous platform
-    // message was in flight, we want to discard the reply rather than calling
-    // setState to update our non-existent appearance.
-    if (!mounted) return;
   }
 
   void _onBackgroundFetch(String taskId) async {
-    // This is the fetch-event callback.
     print("[BackgroundFetch] Event received: $taskId");
 
     if (taskId == "flutter_background_fetch") {
@@ -108,7 +107,6 @@ class _MyHomePageState extends State<MyHomePage> {
         }
 
       }
-
       print("foreground detected plants " + plants.join(' '));
 
       if (plants.isNotEmpty) {
@@ -121,8 +119,7 @@ class _MyHomePageState extends State<MyHomePage> {
     BackgroundFetch.finish(taskId);
   }
 
-  /// This event fires shortly before your task is about to timeout.  You must finish any outstanding work and call BackgroundFetch.finish(taskId).
-  void _onBackgroundFetchTimeout(String taskId) {
+   void _onBackgroundFetchTimeout(String taskId) {
     print("[BackgroundFetch] TIMEOUT: $taskId");
     BackgroundFetch.finish(taskId);
   }
@@ -130,7 +127,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<void> _showWaterAllPlantsDialog() async {
     return showDialog<void>(
       context: context,
-      barrierDismissible: false, // user must tap button!
+      barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text(AppLocalizations.of(context)!.careAll),
@@ -182,7 +179,6 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             Padding(
               padding: const EdgeInsets.all(10),
-              //apply padding to all four sides
               child: Text(
                 _currentPage == Page.today
                     ? AppLocalizations.of(context)!.mainNoCares
@@ -217,21 +213,12 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
-
     String title = titleSelector();
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
         toolbarHeight: 70,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
         title: FittedBox(fit: BoxFit.fitWidth, child: Text(title)),
         automaticallyImplyLeading: false,
         titleTextStyle: Theme.of(context).textTheme.displayLarge,

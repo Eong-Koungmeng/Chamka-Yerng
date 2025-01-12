@@ -1,7 +1,5 @@
-import 'dart:io';
 import 'package:background_fetch/background_fetch.dart';
 import 'package:chamka_yerng/provider/app_settings.dart';
-import 'package:chamka_yerng/screens/error.dart';
 import 'package:chamka_yerng/screens/login_screen.dart';
 import 'package:chamka_yerng/themes/darkTheme.dart';
 import 'package:chamka_yerng/themes/lightTheme.dart';
@@ -33,18 +31,16 @@ void main() async {
 
   final currentUser = FirebaseAuth.instance.currentUser;
 
-  print("hello");
   runApp(
     ChangeNotifierProvider(
       create: (_) => appSettings,
       child: ChamkaYerngApp(isLoggedIn: currentUser != null),
     ),
   );
-
   BackgroundFetch.registerHeadlessTask(backgroundFetchHeadlessTask);
 }
 
-/// This "Headless Task" is run when app is terminated.
+
 @pragma('vm:entry-point')
 void backgroundFetchHeadlessTask(HeadlessTask task) async {
   await Firebase.initializeApp();
@@ -131,7 +127,7 @@ class ChamkaYerngApp extends StatelessWidget {
       theme: buildLightThemeData(),
       darkTheme: buildDarkThemeData(),
       themeMode: appSettings.themeMode,
-      home: isLoggedIn ? MyHomePage(title: 'Today') : LoginPage(),
+      home: isLoggedIn ? const MyHomePage(title: 'Today') : LoginPage(),
     );
   }
 }

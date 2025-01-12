@@ -9,7 +9,7 @@ ThemeData buildLightThemeData() {
     colorScheme: const ColorScheme.light(
         surfaceTint: Colors.transparent,
         primary: Colors.black54,
-        secondary: Colors.teal),
+        secondary: Color(0xFF268f78)),
     textTheme: const TextTheme(
         displayLarge: TextStyle(
             color: Colors.black54,
