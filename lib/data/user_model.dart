@@ -2,8 +2,10 @@ class UserModel {
   final String uid;
   final String username;
   final String email;
+  final String? profilePicture;
+  final String? phoneNumber;
 
-  UserModel({required this.uid, required this.username, required this.email});
+  UserModel({required this.uid, required this.username, required this.email, this.profilePicture, this.phoneNumber});
 
   // Convert a UserModel object to a map for saving to Firebase
   Map<String, dynamic> toMap() {
@@ -11,6 +13,8 @@ class UserModel {
       'uid': uid,
       'username': username,
       'email': email,
+      'profilePicture': profilePicture,
+      'phoneNumber': phoneNumber,
     };
   }
 
@@ -20,6 +24,8 @@ class UserModel {
       uid: map['uid'] ?? '',
       username: map['username'] ?? '',
       email: map['email'] ?? '',
+      profilePicture: map['profilePicture'] ?? '',
+      phoneNumber: map['phoneNumber'] ?? '',
     );
   }
 }

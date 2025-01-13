@@ -107,7 +107,7 @@ class _CarePlantScreen extends State<CarePlantScreen> {
     return Scaffold(
         appBar: AppBar(
           toolbarHeight: 70,
-          automaticallyImplyLeading: false,
+          automaticallyImplyLeading: true,
           title: FittedBox(fit: BoxFit.fitWidth, child: Text(plant.name)),
           elevation: 0.0,
           backgroundColor: Colors.transparent,

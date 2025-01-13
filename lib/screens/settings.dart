@@ -148,7 +148,7 @@ class _SettingsScreen extends State<SettingsScreen> {
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 70,
-        automaticallyImplyLeading: false,
+        automaticallyImplyLeading: true,
         title: FittedBox(
             fit: BoxFit.fitWidth,
             child: Text(AppLocalizations.of(context)!.tooltipSettings)),
@@ -176,7 +176,8 @@ class _SettingsScreen extends State<SettingsScreen> {
                     title: const Text("Profile"),
                     subtitle: Text(currentUser?.email ?? "Loading..."), // Display username
                     onTap: ()
-                    {
+                    async {
+                      await fetchUserDetails();
                       Navigator.push(
                         context,
                         MaterialPageRoute(

@@ -288,7 +288,7 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 70,
-        automaticallyImplyLeading: false,
+        automaticallyImplyLeading: true,
         title: FittedBox(
             fit: BoxFit.fitWidth,
             child: widget.update

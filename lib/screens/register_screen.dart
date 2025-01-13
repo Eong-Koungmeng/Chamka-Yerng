@@ -39,6 +39,8 @@ class RegisterPage extends StatelessWidget {
           uid: uid,
           username: usernameController.text,
           email: emailController.text,
+          phoneNumber: '',
+          profilePicture: ''
         );
 
         // Save the user data to Firebase Realtime Database
