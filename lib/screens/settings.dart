@@ -155,29 +155,6 @@ class _SettingsScreen extends State<SettingsScreen> {
                     },
                   ),
                   ListTile(
-                    leading: const Icon(Icons.info_outline_rounded),
-                    subtitle: Transform.translate(
-                      offset: const Offset(-10, -5),
-                      child:
-                      Text(AppLocalizations.of(context)!.notificationInfo),
-                    ),
-                  ),
-                  ListTile(
-                      trailing: const Icon(Icons.arrow_right),
-                      leading: const Icon(Icons.circle_notifications,
-                          color: Colors.red),
-                      title: Text(
-                          AppLocalizations.of(context)!.testNotificationButton),
-                      onTap: () {
-                        notify.singleNotification(
-                            AppLocalizations.of(context)!.testNotificationTitle,
-                            AppLocalizations.of(context)!.testNotificationBody,
-                            2);
-                      }),
-                  const Divider(height: 1),
-
-                  // Language Selection
-                  ListTile(
                     leading: const Icon(Icons.language, color: Colors.green),
                     title: Text("language"),
                     subtitle: Text(appSettings.locale.languageCode == 'en'
@@ -191,7 +168,6 @@ class _SettingsScreen extends State<SettingsScreen> {
                     },
                   ),
 
-                  // Theme Selection
                   ListTile(
                     leading: const Icon(Icons.brightness_6, color: Colors.amber),
                     title: Text("theme"),
@@ -206,8 +182,18 @@ class _SettingsScreen extends State<SettingsScreen> {
                       await appSettings.updateThemeMode(newThemeMode);
                     },
                   ),
-
-                  // Logout Option
+                  ListTile(
+                      leading: const Icon(Icons.circle_notifications,
+                          color: Colors.red),
+                      title: Text(
+                          AppLocalizations.of(context)!.testNotificationButton),
+                      onTap: () {
+                        notify.singleNotification(
+                            AppLocalizations.of(context)!.testNotificationTitle,
+                            AppLocalizations.of(context)!.testNotificationBody,
+                            2);
+                      }),
+                  const Divider(height: 1),
                   ListTile(
                     trailing: const Icon(Icons.arrow_right),
                     leading: const Icon(Icons.logout, color: Colors.red),
