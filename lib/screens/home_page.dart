@@ -259,6 +259,26 @@ class _MyHomePageState extends State<MyHomePage> {
                   },
                 )
               : const SizedBox.shrink(),
+          _currentPage == Page.garden
+              ? IconButton(
+            icon: const Icon(Icons.add),
+            iconSize: 25,
+            color: Theme.of(context).colorScheme.primary,
+            tooltip: AppLocalizations.of(context)!.tooltipNewPlant,
+              onPressed: () async {
+                await Navigator.push(
+                    context,
+                    MaterialPageRoute<void>(
+                      builder: (context) => const ManagePlantScreen(
+                          title: "Manage plant", update: false),
+                    ));
+                setState(() {
+                  _currentPage = Page.garden;
+                  _loadPlants();
+                });
+              }
+          )
+              : const SizedBox.shrink(),
           IconButton(
             icon: const Icon(Icons.settings),
             iconSize: 25,
@@ -321,25 +341,6 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ],
       ),
-
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          await Navigator.push(
-              context,
-              MaterialPageRoute<void>(
-                builder: (context) => const ManagePlantScreen(
-                    title: "Manage plant", update: false),
-              ));
-          setState(() {
-            _currentPage = Page.garden;
-            _loadPlants();
-          });
-        },
-        tooltip: AppLocalizations.of(context)!.tooltipNewPlant,
-        child: const Icon(Icons.add),
-        backgroundColor: Theme.of(context).colorScheme.secondary,
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 
