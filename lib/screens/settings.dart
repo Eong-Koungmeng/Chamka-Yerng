@@ -1,3 +1,5 @@
+import 'package:chamka_yerng/screens/profile_screen.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:chamka_yerng/notifications.dart' as notify;
 import 'package:flutter/services.dart';
@@ -6,6 +8,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import '../data/user_model.dart';
 import '../provider/app_settings.dart';
 import 'login_screen.dart';
 
@@ -22,6 +25,30 @@ class _SettingsScreen extends State<SettingsScreen> {
   int notificationTempo = 60;
   String selectedLanguage = 'en';
   bool isDarkTheme = false;
+  UserModel? currentUser; // Store the fetched user data here
+
+  Future<void> fetchUserDetails() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      final uid = user.uid;
+      final ref = FirebaseDatabase.instance.ref("users/$uid");
+      final snapshot = await ref.get();
+
+      if (snapshot.exists) {
+        setState(() {
+          currentUser = UserModel.fromMap(Map<String, dynamic>.from(snapshot.value as Map));
+        });
+      } else {
+        setState(() {
+          currentUser = null;
+        });
+      }
+    } else {
+      setState(() {
+        currentUser = null;
+      });
+    }
+  }
 
   void _handleLogout(BuildContext context) async {
     try {
@@ -111,6 +138,7 @@ class _SettingsScreen extends State<SettingsScreen> {
   void initState() {
     super.initState();
     getSharedPrefs();
+    fetchUserDetails();
   }
 
   @override
@@ -142,6 +170,23 @@ class _SettingsScreen extends State<SettingsScreen> {
                   borderRadius: BorderRadius.circular(10.0),
                 ),
                 child: Column(children: <Widget>[
+                  ListTile(
+                    trailing: const Icon(Icons.open_in_new),
+                    leading: const Icon(Icons.person, color: Colors.blue),
+                    title: const Text("Profile"),
+                    subtitle: Text(currentUser?.email ?? "Loading..."), // Display username
+                    onTap: ()
+                    {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ProfileScreen(
+                            user: currentUser!,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
                   ListTile(
                     trailing: const Icon(Icons.arrow_right),
                     leading: const Icon(Icons.alarm, color: Colors.blue),
