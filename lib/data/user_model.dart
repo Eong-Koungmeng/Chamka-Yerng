@@ -19,7 +19,7 @@ class UserModel {
   }
 
   // Create a UserModel object from a map (useful when fetching data from Firebase)
-  factory UserModel.fromMap(Map<String, dynamic> map) {
+  factory UserModel.fromMap(Map<dynamic, dynamic> map) {
     return UserModel(
       uid: map['uid'] ?? '',
       username: map['username'] ?? '',

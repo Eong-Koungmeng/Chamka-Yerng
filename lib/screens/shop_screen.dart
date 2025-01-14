@@ -1,3 +1,5 @@
+import 'package:chamka_yerng/data/plant_listing.dart';
+import 'package:chamka_yerng/screens/plant_listing_detail.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 
@@ -10,8 +12,8 @@ class ShopScreen extends StatefulWidget {
 
 class _ShopScreenState extends State<ShopScreen> {
   final DatabaseReference _database = FirebaseDatabase.instance.ref();
-  List<Map<dynamic, dynamic>> _allPlantListings = [];
-  List<Map<dynamic, dynamic>> _displayedListings = [];
+  List<PlantListing> _allPlantListings = [];
+  List<PlantListing> _displayedListings = [];
   String _searchQuery = "";
   bool _showLatest = true;
 
@@ -25,20 +27,12 @@ class _ShopScreenState extends State<ShopScreen> {
     try {
       final snapshot = await _database.child('plant_listings').get();
       if (snapshot.exists) {
-        final Map<dynamic, dynamic> listings = snapshot.value as Map<dynamic, dynamic>;
-        final sortedListings = listings.values
-            .toList()
-            .cast<Map<dynamic, dynamic>>()
-            .map((listing) => {
-          ...listing,
-          'createdAt': DateTime.parse(listing['createdAt']),
-        })
-            .toList()
-          ..sort((a, b) => (b['createdAt'] as DateTime).compareTo(a['createdAt'] as DateTime));
+        final Iterable<DataSnapshot> data = snapshot.children;
+        final listings = data.map((data) => PlantListing.fromMap(data.value as Map<dynamic, dynamic>)).toList();
 
         setState(() {
-          _allPlantListings = sortedListings;
-          _displayedListings = sortedListings;
+          _allPlantListings = listings;
+          _displayedListings = listings;
         });
       } else {
         setState(() {
@@ -58,7 +52,7 @@ class _ShopScreenState extends State<ShopScreen> {
       _searchQuery = query;
       _displayedListings = _allPlantListings
           .where((listing) =>
-          listing['title'].toString().toLowerCase().contains(query.toLowerCase()))
+          listing.title.toString().toLowerCase().contains(query.toLowerCase()))
           .toList();
     });
   }
@@ -82,16 +76,20 @@ class _ShopScreenState extends State<ShopScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Search Bar
-              TextField(
-                onChanged: _filterListings,
-                decoration: InputDecoration(
-                  prefixIcon: const Icon(Icons.search),
-                  hintText: 'Search plants...',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: TextField(
+                  onChanged: _filterListings,
+                  decoration: InputDecoration(
+                    hintText: 'Search plants...',
+                    prefixIcon: const Icon(Icons.search),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
                   ),
                 ),
               ),
+
               const SizedBox(height: 15),
               // Filters Row
               Row(
@@ -139,10 +137,15 @@ class _ShopScreenState extends State<ShopScreen> {
     );
   }
 
-  Widget _buildPlantCard(Map<dynamic, dynamic> listing) {
+  Widget _buildPlantCard(PlantListing listing) {
     return GestureDetector(
       onTap: () {
-        // Navigate to a detailed screen or perform an action
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => PlantListingDetail(listing: listing),
+          ),
+        );
       },
       child: Card(
         elevation: 3,
@@ -155,9 +158,9 @@ class _ShopScreenState extends State<ShopScreen> {
             Expanded(
               child: ClipRRect(
                 borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
-                child: listing['imageUrl'] != null
+                child: listing.imageUrl != null
                     ? Image.network(
-                  listing['imageUrl'],
+                  listing.imageUrl,
                   fit: BoxFit.cover,
                   width: double.infinity,
                 )
@@ -170,7 +173,7 @@ class _ShopScreenState extends State<ShopScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    listing['title'] ?? 'Untitled',
+                    listing.title,
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 14,
@@ -180,7 +183,7 @@ class _ShopScreenState extends State<ShopScreen> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    "\$${listing['price']?.toStringAsFixed(2) ?? '0.00'}",
+                    "\$${listing.price?.toStringAsFixed(2) ?? '0.00'}",
                     style: const TextStyle(
                       color: Colors.green,
                       fontWeight: FontWeight.bold,
@@ -189,7 +192,7 @@ class _ShopScreenState extends State<ShopScreen> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    listing['description'] ?? 'No description',
+                    listing.description ?? 'No description',
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(fontSize: 10),

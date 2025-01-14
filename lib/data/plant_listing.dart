@@ -35,16 +35,16 @@ class PlantListing {
     };
   }
 
-  factory PlantListing.fromMap(Map<String, dynamic> map) {
+  factory PlantListing.fromMap(Map<dynamic, dynamic> map) {
     return PlantListing(
-      id: map['id'],
-      title: map['title'],
-      description: map['description'],
-      imageUrl: map['imageUrl'],
-      price: map['price'],
-      sellerId: map['sellerId'],
-      sellerName: map['sellerName'],
-      sellerContact: map['sellerContact'],
+      id: map['id'] as String? ?? '',
+      title: map['title'] as String? ?? '',
+      description: map['description'] as String? ?? '',
+      imageUrl: map['imageUrl'] as String? ?? '',
+      price: (map['price'] is int) ? (map['price'] as int).toDouble() : map['price'] is double? ? map['price'] as double : 0.0,
+      sellerId: map['sellerId'] as String? ?? '',
+      sellerName: map['sellerName'] as String? ?? '',
+      sellerContact: map['sellerContact'] as String? ?? '',
       createdAt: DateTime.parse(map['createdAt'] as String? ?? DateTime.now().toIso8601String()),
     );
   }
