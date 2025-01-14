@@ -38,6 +38,7 @@ class _MyHomePageState extends State<MyHomePage> {
   bool _dateFilterEnabled = false;
   DateTime _dateFilter = DateTime.now();
   Page _currentPage = Page.today;
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -48,7 +49,6 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-
   }
 
   @override
@@ -107,7 +107,6 @@ class _MyHomePageState extends State<MyHomePage> {
           }
           break;
         }
-
       }
       print("foreground detected plants " + plants.join(' '));
 
@@ -121,7 +120,7 @@ class _MyHomePageState extends State<MyHomePage> {
     BackgroundFetch.finish(taskId);
   }
 
-   void _onBackgroundFetchTimeout(String taskId) {
+  void _onBackgroundFetchTimeout(String taskId) {
     print("[BackgroundFetch] TIMEOUT: $taskId");
     BackgroundFetch.finish(taskId);
   }
@@ -255,29 +254,28 @@ class _MyHomePageState extends State<MyHomePage> {
                           Duration(hours: time.hour, minutes: time.minute));
                       _dateFilterEnabled = true;
                       _loadPlants();
-                                        });
+                    });
                   },
                 )
               : const SizedBox.shrink(),
           _currentPage == Page.garden
               ? IconButton(
-            icon: const Icon(Icons.add),
-            iconSize: 25,
-            color: Theme.of(context).colorScheme.primary,
-            tooltip: AppLocalizations.of(context)!.tooltipNewPlant,
-              onPressed: () async {
-                await Navigator.push(
-                    context,
-                    MaterialPageRoute<void>(
-                      builder: (context) => const ManagePlantScreen(
-                          title: "Manage plant", update: false),
-                    ));
-                setState(() {
-                  _currentPage = Page.garden;
-                  _loadPlants();
-                });
-              }
-          )
+                  icon: const Icon(Icons.add),
+                  iconSize: 25,
+                  color: Theme.of(context).colorScheme.primary,
+                  tooltip: AppLocalizations.of(context)!.tooltipNewPlant,
+                  onPressed: () async {
+                    await Navigator.push(
+                        context,
+                        MaterialPageRoute<void>(
+                          builder: (context) => const ManagePlantScreen(
+                              title: "Manage plant", update: false),
+                        ));
+                    setState(() {
+                      _currentPage = Page.garden;
+                      _loadPlants();
+                    });
+                  })
               : const SizedBox.shrink(),
           IconButton(
             icon: const Icon(Icons.settings),
@@ -298,25 +296,20 @@ class _MyHomePageState extends State<MyHomePage> {
         iconTheme: const IconThemeData(color: Colors.white),
         elevation: 0.0,
       ),
-      body: _plants.isEmpty
-          ? noPlants()
-          : ResponsiveGridList(
-              // Horizontal space between grid items
-              horizontalGridSpacing: 10,
-              // Vertical space between grid items
-              verticalGridSpacing: 10,
-              // Horizontal space around the grid
-              horizontalGridMargin: 10,
-              // Vertical space around the grid
-              verticalGridMargin: 10,
-              // The minimum item width (can be smaller, if the layout constraints are smaller)
-              minItemWidth: 150,
-              // The minimum items to show in a single row. Takes precedence over minItemWidth
-              minItemsPerRow: 2,
-              // The maximum items to show in a single row. Can be useful on large screens
-              maxItemsPerRow: 6,
-              children: _buildPlantCards(context) // Changed code
-              ),
+      body: _isLoading
+          ? Center(child: CircularProgressIndicator())
+          : _plants.isEmpty
+              ? noPlants()
+              : ResponsiveGridList(
+                  horizontalGridSpacing: 10,
+                  verticalGridSpacing: 10,
+                  horizontalGridMargin: 10,
+                  verticalGridMargin: 10,
+                  minItemWidth: 150,
+                  minItemsPerRow: 2,
+                  maxItemsPerRow: 6,
+                  children: _buildPlantCards(context) // Changed code
+                  ),
       bottomNavigationBar: NavigationBar(
         onDestinationSelected: (int index) {
           setState(() {
@@ -345,6 +338,9 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   _loadPlants() async {
+    setState(() {
+      _isLoading = true;
+    });
     List<Plant> plants = [];
     Map<String, List<String>> cares = {};
 
@@ -397,6 +393,7 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       _cares = cares;
       _plants = plants;
+      _isLoading = false;
     });
   }
 
@@ -470,29 +467,32 @@ class _MyHomePageState extends State<MyHomePage> {
               children: <Widget>[
                 AspectRatio(
                   aspectRatio: 18 / 12,
-                  child: plant.picture!.isNotEmpty
+                  child: plant.picture != null && plant.picture!.isNotEmpty
                       ? Image.network(
-                    plant.picture!,
-                    fit: BoxFit.cover, // Adjusts how the image fits the widget
-                    loadingBuilder: (context, child, loadingProgress) {
-                      if (loadingProgress == null) return child;
-                      return Center(
-                        child: CircularProgressIndicator(
-                          value: loadingProgress.expectedTotalBytes != null
-                              ? loadingProgress.cumulativeBytesLoaded /
-                              (loadingProgress.expectedTotalBytes ?? 1)
-                              : null,
-                        ),
-                      );
-                    },
-                    errorBuilder: (context, error, stackTrace) {
-                      return const Icon(
-                        Icons.error,
-                        size: 50,
-                        color: Colors.red,
-                      );
-                    },
-                  )
+                          plant.picture!,
+                          fit: BoxFit
+                              .cover, // Adjusts how the image fits the widget
+                          loadingBuilder: (context, child, loadingProgress) {
+                            if (loadingProgress == null) return child;
+                            return Center(
+                              child: CircularProgressIndicator(
+                                value: loadingProgress.expectedTotalBytes !=
+                                        null
+                                    ? loadingProgress.cumulativeBytesLoaded /
+                                        (loadingProgress.expectedTotalBytes ??
+                                            1)
+                                    : null,
+                              ),
+                            );
+                          },
+                          errorBuilder: (context, error, stackTrace) {
+                            return const Icon(
+                              Icons.error,
+                              size: 50,
+                              color: Colors.red,
+                            );
+                          },
+                        )
                       : const Text("No image URL provided."),
                 ),
                 Expanded(

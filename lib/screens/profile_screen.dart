@@ -26,6 +26,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final DatabaseReference _database = FirebaseDatabase.instance.ref();
 
   final usernameController = TextEditingController();
+  final phoneNumberController = TextEditingController();
 
   XFile? _image;
   bool _imageChanged = false;
@@ -35,6 +36,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void initState() {
     super.initState();
     usernameController.text = widget.user.username;
+    phoneNumberController.text = widget.user.phoneNumber ?? '';
   }
 
   String? _getPublicIdFromUrl(String? url) {
@@ -148,6 +150,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       await _database.child('users').child(widget.user.uid).update({
         'username': usernameController.text,
         'profilePicture': profilePictureUrl,
+        'phoneNumber': phoneNumberController.text,
       });
 
       // Update the user model in memory if you're maintaining it somewhere
@@ -156,6 +159,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         username: usernameController.text,
         email: widget.user.email,
         profilePicture: profilePictureUrl,
+        phoneNumber: widget.user.phoneNumber,
       );
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -299,6 +303,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     child: Column(
                       children: [
                         TextFormField(
+                          initialValue: widget.user.email,
+                          enabled: false,
+                          decoration: const InputDecoration(
+                            icon: Icon(Icons.email),
+                            labelText: 'Email',
+                          ),
+                        ),
+                        TextFormField(
                           controller: usernameController,
                           validator: (value) {
                             if (value == null || value.isEmpty) {
@@ -315,13 +327,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                         ),
                         TextFormField(
-                          initialValue: widget.user.email,
-                          enabled: false,
+                          controller: phoneNumberController,
+                          cursorColor: Theme.of(context).colorScheme.secondary,
+                          maxLength: 20,
                           decoration: const InputDecoration(
-                            icon: Icon(Icons.email),
-                            labelText: 'Email',
+                            icon: Icon(Icons.phone),
+                            labelText: 'Phone Number',
+                            helperText: 'Enter your phone number',
                           ),
                         ),
+
                       ],
                     ),
                   ),

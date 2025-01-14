@@ -7,7 +7,7 @@ class Plant {
   String? location;
   String description;
   DateTime createdAt;
-  String? picture;
+  String picture;
   List<Care> cares;
 
   Plant({
@@ -16,7 +16,7 @@ class Plant {
     this.location,
     this.description = "",
     required this.createdAt,
-    this.picture,
+    this.picture = "",
     required this.cares,
   });
 
@@ -28,7 +28,7 @@ class Plant {
       location: map['location'] as String?,
       description: map['description'] as String? ?? "",
       createdAt: DateTime.parse(map['createdAt'] as String? ?? DateTime.now().toIso8601String()),
-      picture: map['picture'] as String?,
+      picture: map['picture'] as String? ?? "",
       cares: (map['cares'] as List<dynamic>?)
           ?.map((e) => Care.fromMap(e as Map<Object?, Object?>))
           .toList() ??

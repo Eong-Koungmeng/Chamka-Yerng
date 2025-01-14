@@ -44,6 +44,7 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
   final descriptionController = TextEditingController();
   final locationController = TextEditingController();
 
+  bool _isLoading = false;
   final _formKey = GlobalKey<FormState>();
 
   final ImagePicker _picker = ImagePicker();
@@ -493,62 +494,78 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () async {
           if (_formKey.currentState!.validate()) {
-            String? imageUrl;
 
-            if (_imageChanged) {
-              if (_image != null) {
-                imageUrl = await _uploadOrReplaceImage(
-                    _image!.path,
-                    existingUrl: widget.update ? widget.plant!.picture : null
-                );
-              } else {
+            setState(() => _isLoading = true);
+            try {
+              String? imageUrl;
+
+              if (_imageChanged) {
+                if (_image != null) {
+                  imageUrl = await _uploadOrReplaceImage(
+                      _image!.path,
+                      existingUrl: widget.update ? widget.plant!.picture : null
+                  );
+                } else {
+                  imageUrl = await _uploadOrReplaceImage(
+                      "assets/avatar_$_prefNumber.png",
+                      isAsset: true,
+                      existingUrl: widget.update ? widget.plant!.picture : null
+                  );
+                }
+                if (imageUrl == null) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text("errorUploadingImage")),
+                  );
+                  return;
+                }
+              } else if  (!widget.update) { //add
                 imageUrl = await _uploadOrReplaceImage(
                     "assets/avatar_$_prefNumber.png",
                     isAsset: true,
-                    existingUrl: widget.update ? widget.plant!.picture : null
+                    existingUrl: null
                 );
+              }
+              else {
+                imageUrl = widget.plant?.picture;
               }
 
-              if (imageUrl == null) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text("errorUploadingImage")),
-                );
-                return;
-              }
-            } else {
-              imageUrl = widget.plant?.picture;
+              final newPlant = Plant(
+                id: widget.plant != null ? widget.plant!.id : generateRandomString(10).hashCode,
+                name: nameController.text,
+                createdAt: _planted,
+                description: descriptionController.text,
+                picture: imageUrl ?? "",
+                location: locationController.text,
+                cares: [],
+              );
+
+              // Assign cares to the plant
+              newPlant.cares.clear();
+              cares.forEach((key, value) {
+                if (value.cycles != 0) {
+                  newPlant.cares.add(Care(
+                    cycles: value.cycles,
+                    effected: value.effected,
+                    name: key,
+                    id: key.hashCode,
+                  ));
+                }
+              });
+
+              // Save the plant
+              await garden.addOrUpdatePlant(newPlant);
+
+              Navigator.popUntil(context, ModalRoute.withName('/'));
+            } finally {
+              setState(() {
+                _isLoading = false;
+              });
             }
-
-            final newPlant = Plant(
-              id: widget.plant != null ? widget.plant!.id : generateRandomString(10).hashCode,
-              name: nameController.text,
-              createdAt: _planted,
-              description: descriptionController.text,
-              picture: imageUrl,
-              location: locationController.text,
-              cares: [],
-            );
-
-            // Assign cares to the plant
-            newPlant.cares.clear();
-            cares.forEach((key, value) {
-              if (value.cycles != 0) {
-                newPlant.cares.add(Care(
-                  cycles: value.cycles,
-                  effected: value.effected,
-                  name: key,
-                  id: key.hashCode,
-                ));
-              }
-            });
-
-            // Save the plant
-            await garden.addOrUpdatePlant(newPlant);
-
-            Navigator.popUntil(context, ModalRoute.withName('/'));
           }
         },
-        label: Text(AppLocalizations.of(context)!.saveButton),
+        label: _isLoading
+            ? const CircularProgressIndicator(color: Colors.white)
+            : Text(AppLocalizations.of(context)!.saveButton),
         icon: const Icon(Icons.save),
         backgroundColor: Theme.of(context).colorScheme.secondary,
       ),
