@@ -1,4 +1,6 @@
 import 'package:chamka_yerng/screens/plant_listing_update.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -18,21 +20,52 @@ class PlantListingDetail extends StatefulWidget {
 
 class _PlantListingDetailState extends State<PlantListingDetail> {
   late PlantListing _listing;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final DatabaseReference _database = FirebaseDatabase.instance.ref();
+  String? _userId;
   bool _wasEdited = false;
   @override
   void initState() {
     super.initState();
     _listing = widget.listing;
+    _loadUserData();
   }
+  Future<void> _loadUserData() async {
+    try {
+      final User? currentUser = _auth.currentUser;
 
+      if (currentUser == null) {
+        // Handle not authenticated case
+        Navigator.of(context).pop();
+        return;
+      }
+
+      final userSnapshot = await _database
+          .child('users')
+          .child(currentUser.uid)
+          .get();
+
+      if (userSnapshot.exists) {
+        final userData = userSnapshot.value as Map<dynamic, dynamic>;
+        setState(() {
+          _userId = currentUser.uid;
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Error loading user data')),
+        );
+        Navigator.of(context).pop();
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $e')),
+      );
+      Navigator.of(context).pop();
+    }
+  }
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-        onWillPop: () async {
-      Navigator.pop(context, _wasEdited);
-      return false;
-    },
-    child: Scaffold(
+    return Scaffold(
       appBar: AppBar(
         toolbarHeight: 70,
         automaticallyImplyLeading: true,
@@ -40,7 +73,7 @@ class _PlantListingDetailState extends State<PlantListingDetail> {
         elevation: 0.0,
         backgroundColor: Colors.transparent,
         shadowColor: Colors.transparent,
-        actions: [
+        actions: [ _userId == _listing.sellerId ?
           IconButton(
             icon: const Icon(Icons.edit),
             iconSize: 25,
@@ -60,7 +93,7 @@ class _PlantListingDetailState extends State<PlantListingDetail> {
                 });
               }
             },
-          )
+          ) : const SizedBox.shrink(),
         ],
         titleTextStyle: Theme.of(context).textTheme.displayLarge,
       ),
@@ -244,7 +277,7 @@ class _PlantListingDetailState extends State<PlantListingDetail> {
               ],
             ),
         ),
-      ),),
+      ),
     );
   }
 }

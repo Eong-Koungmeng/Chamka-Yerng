@@ -1,5 +1,6 @@
 import 'package:chamka_yerng/data/plant_listing.dart';
 import 'package:chamka_yerng/screens/plant_listing_detail.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 
@@ -14,14 +15,22 @@ class _ShopScreenState extends State<ShopScreen> {
   final DatabaseReference _database = FirebaseDatabase.instance.ref();
   List<PlantListing> _allPlantListings = [];
   List<PlantListing> _displayedListings = [];
+  bool _isLoading = false;
   String _searchQuery = "";
   bool _showLatest = true;
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
     print("init shop");
     super.initState();
     _fetchPlantListings();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose(); // Dispose of the controller to avoid memory leaks
+    super.dispose();
   }
 
   Future<void> _fetchPlantListings() async {
@@ -69,7 +78,9 @@ class _ShopScreenState extends State<ShopScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return RefreshIndicator(
+        onRefresh: _fetchPlantListings,
+        child: Column(
       children: [
         Padding(
           padding: const EdgeInsets.all(10.0),
@@ -78,14 +89,33 @@ class _ShopScreenState extends State<ShopScreen> {
             children: [
               // Search Bar
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                padding: const EdgeInsets.symmetric(horizontal: 5.0),
                 child: TextField(
                   onChanged: _filterListings,
+                  controller: _searchController,
                   decoration: InputDecoration(
                     hintText: 'Search plants...',
                     prefixIcon: const Icon(Icons.search),
+                    suffixIcon: _searchController.text.isNotEmpty
+                        ? IconButton(
+                      icon: const Icon(Icons.clear),
+                      onPressed: () {
+                        _searchController.clear();
+                        _filterListings('');
+                      },
+                    )
+                        : null,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(20),
+                      borderSide: const BorderSide(color: Colors.grey), // Border color
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20),
+                      borderSide: const BorderSide(color: Colors.grey, width: 1.5), // Default border
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20),
+                      borderSide: const BorderSide(color: Colors.blue, width: 2), // Focused border
                     ),
                   ),
                 ),
@@ -115,11 +145,12 @@ class _ShopScreenState extends State<ShopScreen> {
             ],
           ),
         ),
-        // Listings
+        _isLoading
+            ? Center(child: CircularProgressIndicator()): _displayedListings.isEmpty
+            ? const Center(child: Text('No plants found.'))
+            :
         Expanded(
-          child: _displayedListings.isEmpty
-              ? const Center(child: Text('No plants found.'))
-              : GridView.builder(
+          child: GridView.builder(
             padding: const EdgeInsets.symmetric(horizontal: 10),
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
@@ -135,7 +166,7 @@ class _ShopScreenState extends State<ShopScreen> {
           ),
         ),
       ],
-    );
+    ));
   }
 
   Widget _buildPlantCard(PlantListing listing) {

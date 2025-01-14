@@ -1,5 +1,6 @@
 import 'package:background_fetch/background_fetch.dart';
 import 'package:chamka_yerng/screens/add_plant_listing.dart';
+import 'package:chamka_yerng/screens/my_plant_listing.dart';
 import 'package:chamka_yerng/screens/shop_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -299,6 +300,20 @@ class _MyHomePageState extends State<MyHomePage> {
                     _loadPlants();
                   });
                 }
+              })
+              : const SizedBox.shrink(),
+          _currentPage == Page.shop
+              ? IconButton(
+              icon: const Icon(Icons.dataset),
+              iconSize: 25,
+              color: Theme.of(context).colorScheme.primary,
+              tooltip: "My listing",
+              onPressed: () async {
+                await Navigator.push(
+                    context,
+                    MaterialPageRoute<void>(
+                      builder: (context) => const MyPlantListing(),
+                    ));
               })
               : const SizedBox.shrink(),
           IconButton(
