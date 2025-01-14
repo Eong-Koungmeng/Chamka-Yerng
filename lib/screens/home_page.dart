@@ -289,11 +289,16 @@ class _MyHomePageState extends State<MyHomePage> {
               color: Theme.of(context).colorScheme.primary,
               tooltip: AppLocalizations.of(context)!.tooltipNewPlant,
               onPressed: () async {
-                await Navigator.push(
+                final result = await Navigator.push(
                     context,
-                    MaterialPageRoute<void>(
+                    MaterialPageRoute<bool>(
                       builder: (context) => const AddPlantListingScreen(title: "Add Listing"),
                     ));
+                if (result == true) {
+                  setState(() {
+                    _loadPlants();
+                  });
+                }
               })
               : const SizedBox.shrink(),
           IconButton(

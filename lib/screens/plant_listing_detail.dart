@@ -4,8 +4,8 @@ import 'package:intl/intl.dart';
 
 import '../data/plant_listing.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-class PlantListingDetail extends StatelessWidget {
-  final PlantListing  listing;
+class PlantListingDetail extends StatefulWidget {
+  final PlantListing listing;
 
   const PlantListingDetail({
     Key? key,
@@ -13,12 +13,30 @@ class PlantListingDetail extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  State<PlantListingDetail> createState() => _PlantListingDetailState();
+}
+
+class _PlantListingDetailState extends State<PlantListingDetail> {
+  late PlantListing _listing;
+  bool _wasEdited = false;
+  @override
+  void initState() {
+    super.initState();
+    _listing = widget.listing;
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return WillPopScope(
+        onWillPop: () async {
+      Navigator.pop(context, _wasEdited);
+      return false;
+    },
+    child: Scaffold(
       appBar: AppBar(
         toolbarHeight: 70,
         automaticallyImplyLeading: true,
-        title: FittedBox(fit: BoxFit.fitWidth, child: Text(listing.title)),
+        title: FittedBox(fit: BoxFit.fitWidth, child: Text(_listing.title)),
         elevation: 0.0,
         backgroundColor: Colors.transparent,
         shadowColor: Colors.transparent,
@@ -29,11 +47,18 @@ class PlantListingDetail extends StatelessWidget {
             color: Theme.of(context).colorScheme.primary,
             tooltip: AppLocalizations.of(context)!.tooltipEdit,
             onPressed: () async {
-              await Navigator.push(
-                  context,
-                  MaterialPageRoute<void>(
-                    builder: (context) => PlantListingUpdateScreen(listing: listing),
-                  ));
+              final updatedListing = await Navigator.push<PlantListing>(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => PlantListingUpdateScreen(listing: _listing),
+                ),
+              );
+              if (updatedListing != null) {
+                setState(() {
+                  _listing = updatedListing;
+                  _wasEdited = true;
+                });
+              }
             },
           )
         ],
@@ -54,9 +79,9 @@ class PlantListingDetail extends StatelessWidget {
                   child:
                     AspectRatio(
                       aspectRatio: 16 / 9,
-                      child: listing.imageUrl != null
+                      child: _listing.imageUrl != null
                           ? Image.network(
-                        listing.imageUrl,
+                        _listing.imageUrl,
                         fit: BoxFit.fitHeight,
                         height: 200,
                       )
@@ -89,7 +114,7 @@ class PlantListingDetail extends StatelessWidget {
                                 children: [
                                   Expanded(
                                     child: Text(
-                                      listing.title ?? 'Untitled',
+                                      _listing.title ?? 'Untitled',
                                       style: const TextStyle(
                                         fontSize: 24,
                                         fontWeight: FontWeight.bold,
@@ -100,7 +125,7 @@ class PlantListingDetail extends StatelessWidget {
                                   ),
                                   const SizedBox(width: 8),
                                   Text(
-                                    "\$${listing.price?.toStringAsFixed(2) ?? '0.00'}",
+                                    "\$${_listing.price?.toStringAsFixed(2) ?? '0.00'}",
                                     style: const TextStyle(
                                       fontSize: 20,
                                       color: Colors.green,
@@ -112,8 +137,8 @@ class PlantListingDetail extends StatelessWidget {
                               const SizedBox(height: 10),
 
                               Text(
-                                listing.createdAt != null
-                                    ? DateFormat('dd MMMM yyyy').format(listing.createdAt) // Format the date
+                                _listing.createdAt != null
+                                    ? DateFormat('dd MMMM yyyy').format(_listing.createdAt) // Format the date
                                     : 'Unknown',
                                 style: const TextStyle(fontSize: 16),
                               ),
@@ -127,7 +152,7 @@ class PlantListingDetail extends StatelessWidget {
                                 ),
                               ),
                               Text(
-                                listing.description?? 'No description available.',
+                                _listing.description?? 'No description available.',
                                 style: const TextStyle(fontSize: 16, height: 1.5),
                               ),
                               const SizedBox(height: 20),
@@ -146,7 +171,7 @@ class PlantListingDetail extends StatelessWidget {
                                   const Icon(Icons.person, color: Colors.grey),
                                   const SizedBox(width: 10),
                                   Text(
-                                    listing.sellerName ?? 'Unknown Seller',
+                                    _listing.sellerName ?? 'Unknown Seller',
                                     style: const TextStyle(fontSize: 16),
                                   ),
                                 ],
@@ -157,7 +182,7 @@ class PlantListingDetail extends StatelessWidget {
                                   const Icon(Icons.phone, color: Colors.grey),
                                   const SizedBox(width: 10),
                                   Text(
-                                    listing.sellerContact ?? 'No contact info',
+                                    _listing.sellerContact ?? 'No contact info',
                                     style: const TextStyle(fontSize: 16),
                                   ),
                                 ],
@@ -220,7 +245,7 @@ class PlantListingDetail extends StatelessWidget {
               ],
             ),
         ),
-      ),
+      ),),
     );
   }
 }

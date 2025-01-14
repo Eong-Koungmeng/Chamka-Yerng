@@ -186,8 +186,7 @@ class _AddPlantListingScreenState extends State<AddPlantListingScreen> {
         const SnackBar(content: Text('Listing created successfully!')),
       );
 
-      Navigator.pop(context, listing);
-      Navigator.popUntil(context, ModalRoute.withName('/'));
+      Navigator.pop(context, true);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error creating listing: $e')),
