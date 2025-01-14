@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "829481770217",
+    "firebase_url": "https://chamka-yerng-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "chamka-yerng",
+    "storage_bucket": "chamka-yerng.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:829481770217:android:f9e1e966f062640f922478",
+        "android_client_info": {
+          "package_name": "com.ite.chamkayerng"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCf-Kds7LC7j5PmCY5ZFs-0BEPjJC-uXQE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
