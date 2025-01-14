@@ -56,6 +56,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    print("change home");
     initPlatformState();
   }
 
@@ -291,7 +292,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 await Navigator.push(
                     context,
                     MaterialPageRoute<void>(
-                      builder: (context) => const AddPlantListingScreen(),
+                      builder: (context) => const AddPlantListingScreen(title: "Add Listing"),
                     ));
               })
               : const SizedBox.shrink(),

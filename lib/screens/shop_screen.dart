@@ -19,6 +19,7 @@ class _ShopScreenState extends State<ShopScreen> {
 
   @override
   void initState() {
+    print("init shop");
     super.initState();
     _fetchPlantListings();
   }

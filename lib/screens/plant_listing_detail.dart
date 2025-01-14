@@ -1,3 +1,4 @@
+import 'package:chamka_yerng/screens/plant_listing_update.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -28,7 +29,11 @@ class PlantListingDetail extends StatelessWidget {
             color: Theme.of(context).colorScheme.primary,
             tooltip: AppLocalizations.of(context)!.tooltipEdit,
             onPressed: () async {
-
+              await Navigator.push(
+                  context,
+                  MaterialPageRoute<void>(
+                    builder: (context) => PlantListingUpdateScreen(listing: listing),
+                  ));
             },
           )
         ],
@@ -72,8 +77,7 @@ class PlantListingDetail extends StatelessWidget {
                     borderRadius: BorderRadius.circular(10.0),
                   ),
                   child:
-                    Expanded(
-                      child: Padding(
+                  Padding(
                         padding: const EdgeInsets.all(16.0),
                         child: SingleChildScrollView(
                           child: Column(
@@ -109,7 +113,7 @@ class PlantListingDetail extends StatelessWidget {
 
                               Text(
                                 listing.createdAt != null
-                                    ? DateFormat('dd MMMM yyyy').format(listing.createdAt!) // Format the date
+                                    ? DateFormat('dd MMMM yyyy').format(listing.createdAt) // Format the date
                                     : 'Unknown',
                                 style: const TextStyle(fontSize: 16),
                               ),
@@ -166,7 +170,6 @@ class PlantListingDetail extends StatelessWidget {
                         ),
                       ),
                     ),
-                ),
 
                 // Action Buttons
                 Container(

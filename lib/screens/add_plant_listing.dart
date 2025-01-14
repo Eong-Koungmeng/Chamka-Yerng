@@ -15,8 +15,11 @@ import '../data/plant_listing.dart';
 import '../utils/random.dart';
 
 class AddPlantListingScreen extends StatefulWidget {
+  final String title;
   const AddPlantListingScreen({
     Key? key,
+    required this.title
+
   }) : super(key: key);
 
   @override
@@ -184,6 +187,7 @@ class _AddPlantListingScreenState extends State<AddPlantListingScreen> {
       );
 
       Navigator.pop(context, listing);
+      Navigator.popUntil(context, ModalRoute.withName('/'));
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error creating listing: $e')),
@@ -198,7 +202,7 @@ class _AddPlantListingScreenState extends State<AddPlantListingScreen> {
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 70,
-        title: const Text("Add Plant Listing"),
+        title: Text(widget.title),
         elevation: 0.0,
         backgroundColor: Colors.transparent,
         shadowColor: Colors.transparent,
