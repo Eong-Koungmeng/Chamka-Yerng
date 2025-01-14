@@ -1,4 +1,6 @@
 import 'package:background_fetch/background_fetch.dart';
+import 'package:chamka_yerng/screens/add_plant_listing.dart';
+import 'package:chamka_yerng/screens/shop_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -21,7 +23,7 @@ import 'manage_plant.dart';
 import 'care_plant.dart';
 import 'settings.dart';
 
-enum Page { today, garden }
+enum Page { today, garden, shop }
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({Key? key, required this.title}) : super(key: key);
@@ -207,8 +209,10 @@ class _MyHomePageState extends State<MyHomePage> {
           DateFormat('d').format(_dateFilter);
     } else if (_currentPage == Page.garden) {
       return AppLocalizations.of(context)!.buttonGarden;
-    } else {
+    } else if (_currentPage == Page.today) {
       return AppLocalizations.of(context)!.buttonToday;
+    } else {
+      return "Shop";
     }
   }
 
@@ -277,6 +281,20 @@ class _MyHomePageState extends State<MyHomePage> {
                     });
                   })
               : const SizedBox.shrink(),
+          _currentPage == Page.shop
+              ? IconButton(
+              icon: const Icon(Icons.add),
+              iconSize: 25,
+              color: Theme.of(context).colorScheme.primary,
+              tooltip: AppLocalizations.of(context)!.tooltipNewPlant,
+              onPressed: () async {
+                await Navigator.push(
+                    context,
+                    MaterialPageRoute<void>(
+                      builder: (context) => const AddPlantListingScreen(),
+                    ));
+              })
+              : const SizedBox.shrink(),
           IconButton(
             icon: const Icon(Icons.settings),
             iconSize: 25,
@@ -298,18 +316,20 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: _isLoading
           ? Center(child: CircularProgressIndicator())
+          : _currentPage == Page.shop
+          ? ShopScreen()
           : _plants.isEmpty
-              ? noPlants()
-              : ResponsiveGridList(
-                  horizontalGridSpacing: 10,
-                  verticalGridSpacing: 10,
-                  horizontalGridMargin: 10,
-                  verticalGridMargin: 10,
-                  minItemWidth: 150,
-                  minItemsPerRow: 2,
-                  maxItemsPerRow: 6,
-                  children: _buildPlantCards(context) // Changed code
-                  ),
+          ? noPlants()
+          : ResponsiveGridList(
+        horizontalGridSpacing: 10,
+        verticalGridSpacing: 10,
+        horizontalGridMargin: 10,
+        verticalGridMargin: 10,
+        minItemWidth: 150,
+        minItemsPerRow: 2,
+        maxItemsPerRow: 6,
+        children: _buildPlantCards(context),
+      ),
       bottomNavigationBar: NavigationBar(
         onDestinationSelected: (int index) {
           setState(() {
@@ -331,6 +351,12 @@ class _MyHomePageState extends State<MyHomePage> {
                 Icon(Icons.grass, color: Theme.of(context).colorScheme.surface),
             icon: const Icon(Icons.grass_outlined),
             label: AppLocalizations.of(context)!.buttonGarden,
+          ),
+          NavigationDestination(
+            selectedIcon: Icon(Icons.store,
+                color: Theme.of(context).colorScheme.surface),
+            icon: const Icon(Icons.store_outlined),
+            label: "Shop",
           ),
         ],
       ),
