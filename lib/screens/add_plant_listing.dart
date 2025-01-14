@@ -236,7 +236,7 @@ class _AddPlantListingScreenState extends State<AddPlantListingScreen> {
                       )
                           : Image.file(
                         File(_image!.path),
-                        fit: BoxFit.cover,
+                        fit: BoxFit.fitHeight,
                       ),
                     ),
                     const SizedBox(height: 10),
@@ -275,13 +275,13 @@ class _AddPlantListingScreenState extends State<AddPlantListingScreen> {
                           controller: titleController,
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return 'Please enter a title';
+                              return 'Please enter a name';
                             }
                             return null;
                           },
                           decoration: const InputDecoration(
                             icon: Icon(Icons.title),
-                            labelText: 'Title',
+                            labelText: 'Name',
                             helperText: 'Enter the name of your plant',
                           ),
                         ),
@@ -316,20 +316,6 @@ class _AddPlantListingScreenState extends State<AddPlantListingScreen> {
                             icon: Icon(Icons.attach_money),
                             labelText: 'Price',
                             helperText: 'Enter the price in dollars',
-                          ),
-                        ),
-                        TextFormField(
-                          controller: contactController,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter contact information';
-                            }
-                            return null;
-                          },
-                          decoration: const InputDecoration(
-                            icon: Icon(Icons.contact_phone),
-                            labelText: 'Contact Information',
-                            helperText: 'How can buyers reach you?',
                           ),
                         ),
                       ],
