@@ -43,11 +43,9 @@ class RegisterPage extends StatelessWidget {
           profilePicture: ''
         );
 
-        // Save the user data to Firebase Realtime Database
         DatabaseReference userRef = FirebaseDatabase.instance.ref().child('users').child(uid);
         await userRef.set(newUser.toMap());
 
-        // Navigate to home page
         Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(builder: (context) => MyHomePage(title: 'Today')),

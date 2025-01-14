@@ -31,9 +31,6 @@ class ErrorPage extends StatelessWidget {
           children: <Widget>[
             const Padding(
               padding: EdgeInsets.only(left: 5, bottom: 20, right: 5, top: 0),
-              // ★~(◠︿◕✿)
-              // (◕︿◕✿)
-              // (◕﹏◕✿)
               child: Text('(◕﹏◕✿)',
                   style: TextStyle(color: Colors.redAccent, fontSize: 45)),
             ),

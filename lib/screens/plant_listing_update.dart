@@ -38,7 +38,6 @@ class _PlantListingUpdateScreenState extends State<PlantListingUpdateScreen> {
   bool _imageChanged = false;
   bool _isLoading = false;
 
-
   @override
   void initState() {
     super.initState();

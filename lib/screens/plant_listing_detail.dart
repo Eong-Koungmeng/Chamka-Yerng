@@ -189,7 +189,6 @@ class _PlantListingDetailState extends State<PlantListingDetail> {
                               ),
                               const SizedBox(height: 10),
 
-
                             ],
                           ),
                         ),

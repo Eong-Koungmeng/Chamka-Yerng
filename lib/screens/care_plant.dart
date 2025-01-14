@@ -11,13 +11,10 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class CarePlantScreen extends StatefulWidget {
   const CarePlantScreen({Key? key, required this.title}) : super(key: key);
-
   final String title;
-
   @override
   State<CarePlantScreen> createState() => _CarePlantScreen();
 }
-
 class _CarePlantScreen extends State<CarePlantScreen> {
   int periodicityInHours = 1;
   Map<Care, bool?> careCheck = {};
@@ -45,7 +42,7 @@ class _CarePlantScreen extends State<CarePlantScreen> {
   Future<void> _showDeletePlantDialog(Plant plant) async {
     return showDialog<void>(
       context: context,
-      barrierDismissible: false, // user must tap button!
+      barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text(AppLocalizations.of(context)!.deletePlantTitle),
@@ -76,7 +73,6 @@ class _CarePlantScreen extends State<CarePlantScreen> {
       },
     );
   }
-
   List<CheckboxListTile> _buildCares(BuildContext context, Plant plant) {
     return plant.cares.map((care) {
       int daysToCare =
