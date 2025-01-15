@@ -98,6 +98,7 @@ class _PlantListingDetailState extends State<PlantListingDetail> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         toolbarHeight: 70,
         automaticallyImplyLeading: true,
@@ -277,7 +278,7 @@ class _PlantListingDetailState extends State<PlantListingDetail> {
                       },
                       icon: const Icon(
                           Icons.copy), // Changed icon to indicate copying
-                      label: const Text('Copy Seller Contact'),
+                      label: const Text('Copy Contact'),
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 12),
                         shape: RoundedRectangleBorder(

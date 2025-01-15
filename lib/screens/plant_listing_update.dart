@@ -44,7 +44,6 @@ class _PlantListingUpdateScreenState extends State<PlantListingUpdateScreen> {
     _titleController = TextEditingController(text: widget.listing.title);
     _descriptionController =
         TextEditingController(text: widget.listing.description);
-    _imageUrlController = TextEditingController(text: widget.listing.imageUrl);
     _priceController =
         TextEditingController(text: widget.listing.price.toString());
     _sellerNameController =
@@ -57,7 +56,6 @@ class _PlantListingUpdateScreenState extends State<PlantListingUpdateScreen> {
   void dispose() {
     _titleController.dispose();
     _descriptionController.dispose();
-    _imageUrlController.dispose();
     _priceController.dispose();
     _sellerNameController.dispose();
     _sellerContactController.dispose();
@@ -293,7 +291,7 @@ class _PlantListingUpdateScreenState extends State<PlantListingUpdateScreen> {
             .update({
           'title': _titleController.text,
           'description': _descriptionController.text,
-          'imageUrl': _imageUrlController.text,
+          'imageUrl': profilePictureUrl,
           'price': double.tryParse(_priceController.text) ?? 0.0,
           'sellerId':
               widget.listing.sellerId, // Preserved from the original listing
@@ -307,7 +305,7 @@ class _PlantListingUpdateScreenState extends State<PlantListingUpdateScreen> {
           id: widget.listing.id,
           title: _titleController.text,
           description: _descriptionController.text,
-          imageUrl: _imageUrlController.text,
+          imageUrl: profilePictureUrl,
           price: double.tryParse(_priceController.text) ?? 0.0,
           sellerId:
               widget.listing.sellerId, // Preserved from the original listing

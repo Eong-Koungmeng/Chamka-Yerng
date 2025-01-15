@@ -48,15 +48,16 @@ class RegisterPage extends StatelessWidget {
             FirebaseDatabase.instance.ref().child('users').child(uid);
         await userRef.set(newUser.toMap());
 
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(builder: (context) => MyHomePage(title: 'Today')),
-          (route) => false, // This removes all previous routes
-        );
+
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Registration failed: $e')),
+      );
+    } finally {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => MyHomePage(title: 'Today')),
       );
     }
   }
@@ -64,6 +65,7 @@ class RegisterPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(40.0),
