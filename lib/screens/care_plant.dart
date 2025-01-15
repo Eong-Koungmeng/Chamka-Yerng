@@ -66,7 +66,11 @@ class _CarePlantScreen extends State<CarePlantScreen> {
               onPressed: () async {
                 await garden.deletePlant(plant);
 
-                Navigator.popUntil(context, ModalRoute.withName('/'));
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (context) => const ChamkaYerngApp(isLoggedIn: true,)),
+                      (Route<dynamic> route) => false, // This removes all the previous routes
+                );
               },
             ),
           ],

@@ -10,6 +10,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import '../data/plant_listing.dart';
+import '../main.dart';
 
 class PlantListingUpdateScreen extends StatefulWidget {
   final PlantListing listing;
@@ -72,22 +73,26 @@ class _PlantListingUpdateScreenState extends State<PlantListingUpdateScreen> {
           content: SingleChildScrollView(
             child: ListBody(
               children: <Widget>[
-                Text("deletePlantBody"),
+                Text("Delete Plant Listing"),
               ],
             ),
           ),
           actions: <Widget>[
             TextButton(
-              child: Text('no'),
+              child: Text('No'),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
             TextButton(
-              child: Text('yes'),
+              child: Text('Yes'),
               onPressed: () async {
                 await _deleteListing();
-                Navigator.popUntil(context, ModalRoute.withName('/'));
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (context) => const ChamkaYerngApp(isLoggedIn: true,)),
+                      (Route<dynamic> route) => false, // This removes all the previous routes
+                );
               },
             ),
           ],
@@ -157,20 +162,43 @@ class _PlantListingUpdateScreenState extends State<PlantListingUpdateScreen> {
 
   Future<bool> _deleteListing() async {
     try {
+      // Reference to the listing in 'plant_listings'
       DatabaseReference plantRef =
-          _database.child('plant_listings/${widget.listing.id}');
+      _database.child('plant_listings/${widget.listing.id}');
       DataSnapshot snapshot = await plantRef.get();
 
       if (!snapshot.exists) {
         return false;
       }
 
+      // If the listing has an associated image, delete it from Cloudinary
       if (widget.listing.imageUrl != null &&
           widget.listing.imageUrl.contains('cloudinary.com')) {
         await _deleteImageFromCloudinary(widget.listing.imageUrl);
       }
 
+      // Remove the listing from all users' favorites
+      DatabaseReference favoritesRef = _database.child('favorites');
+      DataSnapshot favoritesSnapshot = await favoritesRef.get();
+
+      if (favoritesSnapshot.exists) {
+        final favoritesData = favoritesSnapshot.value;
+
+        if (favoritesData is Map<dynamic, dynamic>) {
+          for (String userId in favoritesData.keys) {
+            final userFavorites = favoritesData[userId];
+
+            if (userFavorites is Map<dynamic, dynamic> &&
+                userFavorites.containsKey(widget.listing.id)) {
+              await favoritesRef.child('$userId/${widget.listing.id}').remove();
+            }
+          }
+        }
+      }
+
+      // Remove the listing from 'plant_listings'
       await plantRef.remove();
+
       return true;
     } catch (e) {
       print('Error deleting plant: $e');

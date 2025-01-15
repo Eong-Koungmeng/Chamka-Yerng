@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import '../main.dart';
 import 'home_page.dart';
 
 class LoginPage extends StatelessWidget {
@@ -20,7 +21,7 @@ class LoginPage extends StatelessWidget {
       );
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => MyHomePage(title: AppLocalizations.of(context)!.buttonToday)),
+        MaterialPageRoute(builder: (context) => const ChamkaYerngApp(isLoggedIn: true,)),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(

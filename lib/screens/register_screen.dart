@@ -3,6 +3,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../data/user_model.dart';
+import '../main.dart';
 import 'home_page.dart';
 
 class RegisterPage extends StatelessWidget {
@@ -57,7 +58,7 @@ class RegisterPage extends StatelessWidget {
     } finally {
       Navigator.pushAndRemoveUntil(
         context,
-        MaterialPageRoute(builder: (context) => MyHomePage(title: AppLocalizations.of(context)!.buttonToday)),
+        MaterialPageRoute(builder: (context) => const ChamkaYerngApp(isLoggedIn: true,)),
             (Route<dynamic> route) => false, // This removes all the previous routes
       );
     }

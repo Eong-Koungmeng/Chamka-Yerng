@@ -113,6 +113,7 @@ class ChamkaYerngApp extends StatelessWidget {
 
     return MaterialApp(
       title: 'Chamka Yerng',
+      debugShowCheckedModeBanner: false,
       localizationsDelegates: const [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
