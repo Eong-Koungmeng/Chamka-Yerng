@@ -568,11 +568,11 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
               // Save the plant
               await garden.addOrUpdatePlant(newPlant);
 
-              Navigator.popUntil(context, ModalRoute.withName('/'));
-            } finally {
-              setState(() {
-                _isLoading = false;
-              });
+              Navigator.pop(context, true);
+            } catch (e) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Error fetching listings: $e')),
+              );
             }
           }
         },

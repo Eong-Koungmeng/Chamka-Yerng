@@ -55,9 +55,10 @@ class RegisterPage extends StatelessWidget {
         SnackBar(content: Text('Registration failed: $e')),
       );
     } finally {
-      Navigator.pushReplacement(
+      Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (context) => MyHomePage(title: 'Today')),
+            (Route<dynamic> route) => false, // This removes all the previous routes
       );
     }
   }
