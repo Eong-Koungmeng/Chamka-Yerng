@@ -40,9 +40,10 @@ class Garden {
       DataSnapshot snapshot = await databaseRef.child('garden/$userId').get();
       if (snapshot.exists) {
         Map<String, dynamic> rawData =
-        Map<String, dynamic>.from(snapshot.value as Map);
+            Map<String, dynamic>.from(snapshot.value as Map);
         Iterable values = rawData.values;
-        allPlants = List<Plant>.from(values.map((model) => Plant.fromMap(model)));
+        allPlants =
+            List<Plant>.from(values.map((model) => Plant.fromMap(model)));
       }
     } catch (e) {
       print('Error fetching plants: $e');
@@ -57,7 +58,8 @@ class Garden {
     }
 
     try {
-      DatabaseReference plantRef = databaseRef.child('garden/$userId/${plant.id}');
+      DatabaseReference plantRef =
+          databaseRef.child('garden/$userId/${plant.id}');
       DataSnapshot snapshot = await plantRef.get();
       bool isUpdate = snapshot.exists;
       await plantRef.set(plant.toMap());
@@ -70,7 +72,6 @@ class Garden {
 
   Future<bool> _deleteImageFromCloudinary(String imageUrl) async {
     try {
-
       final uri = Uri.parse(imageUrl);
       final pathSegments = uri.pathSegments;
 
@@ -92,10 +93,12 @@ class Garden {
 
       final timestamp = DateTime.now().millisecondsSinceEpoch ~/ 1000;
 
-      final signaturePayload = 'public_id=$publicId&timestamp=$timestamp${apiSecret}';
+      final signaturePayload =
+          'public_id=$publicId&timestamp=$timestamp${apiSecret}';
       final signature = sha1.convert(utf8.encode(signaturePayload)).toString();
 
-      final url = Uri.parse('https://api.cloudinary.com/v1_1/$cloudName/image/destroy');
+      final url =
+          Uri.parse('https://api.cloudinary.com/v1_1/$cloudName/image/destroy');
 
       final requestBody = {
         'public_id': publicId,
@@ -122,7 +125,6 @@ class Garden {
       return false;
     }
   }
-
   Future<bool> deletePlant(Plant plant) async {
     if (userId == null) {
       print('User not logged in. Cannot delete plant.');
@@ -130,7 +132,8 @@ class Garden {
     }
 
     try {
-      DatabaseReference plantRef = databaseRef.child('garden/$userId/${plant.id}');
+      DatabaseReference plantRef =
+          databaseRef.child('garden/$userId/${plant.id}');
       DataSnapshot snapshot = await plantRef.get();
 
       if (!snapshot.exists) {
@@ -156,7 +159,8 @@ class Garden {
     }
 
     try {
-      DatabaseReference plantRef = databaseRef.child('garden/$userId/${plant.id}');
+      DatabaseReference plantRef =
+          databaseRef.child('garden/$userId/${plant.id}');
       DataSnapshot snapshot = await plantRef.get();
       if (snapshot.exists) {
         await plantRef.set(plant.toMap());

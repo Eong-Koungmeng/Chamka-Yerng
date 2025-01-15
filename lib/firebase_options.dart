@@ -60,5 +60,4 @@ class DefaultFirebaseOptions {
     projectId: 'chamka-yerng',
     storageBucket: 'chamka-yerng.firebasestorage.app',
   );
-
 }

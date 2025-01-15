@@ -18,7 +18,6 @@ class ErrorPage extends StatelessWidget {
         automaticallyImplyLeading: false,
         backgroundColor: Colors.transparent,
         elevation: 0.0,
-
         title: const FittedBox(fit: BoxFit.fitWidth, child: Text("Error")),
         titleTextStyle: Theme.of(context).textTheme.displayLarge,
       ),
@@ -51,9 +50,9 @@ class ErrorPage extends StatelessWidget {
             OutlinedButton.icon(
               icon: const Icon(Icons.error, size: 18),
               style: OutlinedButton.styleFrom(
-                side:const BorderSide(
-                  color: Colors.transparent,
-                ),
+                  side: const BorderSide(
+                    color: Colors.transparent,
+                  ),
                   foregroundColor: Colors.redAccent,
                   backgroundColor: Colors.white),
               onPressed: () => showDialog<String>(
@@ -65,8 +64,7 @@ class ErrorPage extends StatelessWidget {
                     child: SelectableText(errorDetails.toString(),
                         textAlign: TextAlign.center,
                         style: const TextStyle(
-                            fontSize: 12,
-                            fontFamily: "monospace")),
+                            fontSize: 12, fontFamily: "monospace")),
                   ),
                   actions: <Widget>[
                     TextButton(

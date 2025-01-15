@@ -64,18 +64,23 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
 
       // Find the index after 'upload' and get all remaining segments
       final uploadIndex = pathSegments.indexOf('upload');
-      if (uploadIndex == -1 || uploadIndex + 1 >= pathSegments.length) return null;
+      if (uploadIndex == -1 || uploadIndex + 1 >= pathSegments.length)
+        return null;
 
       // Join the remaining segments (excluding the version number) with '/'
-      final segments = pathSegments.sublist(uploadIndex + 2); // Skip 'upload' and version
-      return segments.join('/').replaceAll(RegExp(r'\.[^.]+$'), ''); // Remove file extension
+      final segments =
+          pathSegments.sublist(uploadIndex + 2); // Skip 'upload' and version
+      return segments
+          .join('/')
+          .replaceAll(RegExp(r'\.[^.]+$'), ''); // Remove file extension
     } catch (e) {
       print("Error extracting public_id: $e");
       return null;
     }
   }
 
-  Future<String?> _uploadOrReplaceImage(String imagePath, {bool isAsset = false, String? existingUrl}) async {
+  Future<String?> _uploadOrReplaceImage(String imagePath,
+      {bool isAsset = false, String? existingUrl}) async {
     try {
       final String cloudName = dotenv.env['CLOUDINARY_CLOUD_NAME'] ?? '';
       final String apiKey = dotenv.env['CLOUDINARY_API_KEY'] ?? '';
@@ -110,7 +115,8 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
       final signature = sha1.convert(utf8.encode(stringToSign)).toString();
 
       // Prepare the upload request
-      final url = Uri.parse("https://api.cloudinary.com/v1_1/$cloudName/image/upload");
+      final url =
+          Uri.parse("https://api.cloudinary.com/v1_1/$cloudName/image/upload");
       final request = http.MultipartRequest("POST", url)
         ..fields['api_key'] = apiKey
         ..fields['timestamp'] = timestamp.toString()
@@ -141,7 +147,8 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
   }
 
   Future getImageFromCam() async {
-    var image = await _picker.pickImage(source: ImageSource.camera, imageQuality: 25);
+    var image =
+        await _picker.pickImage(source: ImageSource.camera, imageQuality: 25);
     setState(() {
       _image = image;
       _imageChanged = true;
@@ -149,7 +156,8 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
   }
 
   Future getImageFromGallery() async {
-    var image = await _picker.pickImage(source: ImageSource.gallery, imageQuality: 25);
+    var image =
+        await _picker.pickImage(source: ImageSource.gallery, imageQuality: 25);
     setState(() {
       _image = image;
       _imageChanged = true;
@@ -234,7 +242,7 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
 
       if (widget.plant!.picture!.contains("avatar")) {
         String? asset =
-        widget.plant!.picture!.replaceAll(RegExp(r'\D'), ''); // '23'
+            widget.plant!.picture!.replaceAll(RegExp(r'\D'), ''); // '23'
         _prefNumber = int.tryParse(asset) ?? 1;
       } else {
         _image = XFile(widget.plant!.picture!);
@@ -274,7 +282,7 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
               '${value.translatedName} ${AppLocalizations.of(context)!.every}'),
           subtitle: cares[key]!.cycles != 0
               ? Text(cares[key]!.cycles.toString() +
-              " ${AppLocalizations.of(context)!.days}")
+                  " ${AppLocalizations.of(context)!.days}")
               : Text(AppLocalizations.of(context)!.never),
           onTap: () {
             _showIntegerDialog(key);
@@ -314,79 +322,85 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
                 elevation: 2,
                 child: SizedBox(
                     child: Column(
-                      children: <Widget>[
-                        const SizedBox(height: 10),
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(20.0),
-                          child: SizedBox(
-                            height: 200,
-                            child: _image == null
-                                ? Image.asset(
-                              "assets/avatar_$_prefNumber.png",
-                              fit: BoxFit.fitWidth,
-                            )
-                                : widget.update && !_imageChanged
+                  children: <Widget>[
+                    const SizedBox(height: 10),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(20.0),
+                      child: SizedBox(
+                        height: 200,
+                        child: _image == null
+                            ? Image.asset(
+                                "assets/avatar_$_prefNumber.png",
+                                fit: BoxFit.fitWidth,
+                              )
+                            : widget.update && !_imageChanged
                                 ? Image.network(
-                              _image!.path,
-                              fit: BoxFit.cover,
-                              loadingBuilder: (context, child, loadingProgress) {
-                                if (loadingProgress == null) return child;
-                                return Center(
-                                  child: CircularProgressIndicator(
-                                    value: loadingProgress.expectedTotalBytes != null
-                                        ? loadingProgress.cumulativeBytesLoaded /
-                                        (loadingProgress.expectedTotalBytes ?? 1)
-                                        : null,
-                                  ),
-                                );
-                              },
-                              errorBuilder: (context, error, stackTrace) {
-                                return const Icon(
-                                  Icons.error,
-                                  size: 50,
-                                  color: Colors.red,
-                                );
-                              },
-                            )
+                                    _image!.path,
+                                    fit: BoxFit.cover,
+                                    loadingBuilder:
+                                        (context, child, loadingProgress) {
+                                      if (loadingProgress == null) return child;
+                                      return Center(
+                                        child: CircularProgressIndicator(
+                                          value: loadingProgress
+                                                      .expectedTotalBytes !=
+                                                  null
+                                              ? loadingProgress
+                                                      .cumulativeBytesLoaded /
+                                                  (loadingProgress
+                                                          .expectedTotalBytes ??
+                                                      1)
+                                              : null,
+                                        ),
+                                      );
+                                    },
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return const Icon(
+                                        Icons.error,
+                                        size: 50,
+                                        color: Colors.red,
+                                      );
+                                    },
+                                  )
                                 : Image.file(
-                              File(_image!.path),
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) {
-                                return const Icon(
-                                  Icons.error,
-                                  size: 50,
-                                  color: Colors.red,
-                                );
-                              },
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: <Widget>[
-                            IconButton(
-                              onPressed: getImageFromCam,
-                              icon: const Icon(Icons.add_a_photo),
-                              tooltip:
+                                    File(_image!.path),
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return const Icon(
+                                        Icons.error,
+                                        size: 50,
+                                        color: Colors.red,
+                                      );
+                                    },
+                                  ),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: <Widget>[
+                        IconButton(
+                          onPressed: getImageFromCam,
+                          icon: const Icon(Icons.add_a_photo),
+                          tooltip:
                               AppLocalizations.of(context)!.tooltipCameraImage,
-                            ),
-                            IconButton(
-                                onPressed: getPrefabImage,
-                                icon: const Icon(Icons.refresh),
-                                tooltip: AppLocalizations.of(context)!
-                                    .tooltipNextAvatar),
-                            IconButton(
-                              onPressed: getImageFromGallery,
-                              icon: const Icon(Icons.wallpaper),
-                              tooltip:
-                              AppLocalizations.of(context)!.tooltipGalleryImage,
-                            )
-                          ],
                         ),
-                        const SizedBox(height: 10),
+                        IconButton(
+                            onPressed: getPrefabImage,
+                            icon: const Icon(Icons.refresh),
+                            tooltip: AppLocalizations.of(context)!
+                                .tooltipNextAvatar),
+                        IconButton(
+                          onPressed: getImageFromGallery,
+                          icon: const Icon(Icons.wallpaper),
+                          tooltip:
+                              AppLocalizations.of(context)!.tooltipGalleryImage,
+                        )
                       ],
-                    )),
+                    ),
+                    const SizedBox(height: 10),
+                  ],
+                )),
               ),
               Card(
                 semanticContainer: true,
@@ -431,7 +445,7 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
                         decoration: InputDecoration(
                           icon: const Icon(Icons.topic),
                           labelText:
-                          AppLocalizations.of(context)!.labelDescription,
+                              AppLocalizations.of(context)!.labelDescription,
                         ),
                       ),
                       TextFormField(
@@ -441,9 +455,9 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
                         decoration: InputDecoration(
                           icon: const Icon(Icons.location_on),
                           labelText:
-                          AppLocalizations.of(context)!.labelLocation,
+                              AppLocalizations.of(context)!.labelLocation,
                           helperText:
-                          AppLocalizations.of(context)!.exampleLocation,
+                              AppLocalizations.of(context)!.exampleLocation,
                         ),
                       ),
                     ]),
@@ -472,7 +486,7 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
                   enabled: !widget.update,
                   title: Text(AppLocalizations.of(context)!.labelDayPlanted),
                   subtitle: Text(DateFormat.yMMMMEEEEd(
-                      Localizations.localeOf(context).languageCode)
+                          Localizations.localeOf(context).languageCode)
                       .format(_planted)),
                   onTap: () async {
                     DateTime? result = await showDatePicker(
@@ -494,23 +508,21 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () async {
           if (_formKey.currentState!.validate()) {
-
             setState(() => _isLoading = true);
             try {
               String? imageUrl;
 
               if (_imageChanged) {
                 if (_image != null) {
-                  imageUrl = await _uploadOrReplaceImage(
-                      _image!.path,
-                      existingUrl: widget.update ? widget.plant!.picture : null
-                  );
+                  imageUrl = await _uploadOrReplaceImage(_image!.path,
+                      existingUrl:
+                          widget.update ? widget.plant!.picture : null);
                 } else {
                   imageUrl = await _uploadOrReplaceImage(
                       "assets/avatar_$_prefNumber.png",
                       isAsset: true,
-                      existingUrl: widget.update ? widget.plant!.picture : null
-                  );
+                      existingUrl:
+                          widget.update ? widget.plant!.picture : null);
                 }
                 if (imageUrl == null) {
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -518,19 +530,20 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
                   );
                   return;
                 }
-              } else if  (!widget.update) { //add
+              } else if (!widget.update) {
+                //add
                 imageUrl = await _uploadOrReplaceImage(
                     "assets/avatar_$_prefNumber.png",
                     isAsset: true,
-                    existingUrl: null
-                );
-              }
-              else {
+                    existingUrl: null);
+              } else {
                 imageUrl = widget.plant?.picture;
               }
 
               final newPlant = Plant(
-                id: widget.plant != null ? widget.plant!.id : generateRandomString(10).hashCode,
+                id: widget.plant != null
+                    ? widget.plant!.id
+                    : generateRandomString(10).hashCode,
                 name: nameController.text,
                 createdAt: _planted,
                 description: descriptionController.text,
@@ -572,12 +585,11 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
     );
   }
 
-
   _loadPlants() async {
     List<Plant> allPlants = await garden.getAllPlants();
     setState(() => _plants = allPlants);
   }
 
-  bool _plantExist(String name) => _plants.contains((plant) => plant.name == name);
-
+  bool _plantExist(String name) =>
+      _plants.contains((plant) => plant.name == name);
 }

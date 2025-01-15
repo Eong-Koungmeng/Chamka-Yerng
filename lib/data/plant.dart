@@ -20,23 +20,22 @@ class Plant {
     required this.cares,
   });
 
-  /// Factory method to create a `Plant` from Firebase data.
   factory Plant.fromMap(Map<Object?, Object?> map) {
     return Plant(
       id: (map['id'] as num?)?.toInt() ?? 0,
       name: map['name'] as String? ?? "",
       location: map['location'] as String?,
       description: map['description'] as String? ?? "",
-      createdAt: DateTime.parse(map['createdAt'] as String? ?? DateTime.now().toIso8601String()),
+      createdAt: DateTime.parse(
+          map['createdAt'] as String? ?? DateTime.now().toIso8601String()),
       picture: map['picture'] as String? ?? "",
       cares: (map['cares'] as List<dynamic>?)
-          ?.map((e) => Care.fromMap(e as Map<Object?, Object?>))
-          .toList() ??
+              ?.map((e) => Care.fromMap(e as Map<Object?, Object?>))
+              .toList() ??
           [],
     );
   }
 
-  /// Method to convert `Plant` to Firebase-compatible Map.
   Map<String, Object?> toMap() {
     return {
       'id': id,

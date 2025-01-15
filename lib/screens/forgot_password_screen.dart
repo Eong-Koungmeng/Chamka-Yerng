@@ -13,7 +13,8 @@ class ForgotPasswordPage extends StatelessWidget {
     }
 
     try {
-      await FirebaseAuth.instance.sendPasswordResetEmail(email: emailController.text);
+      await FirebaseAuth.instance
+          .sendPasswordResetEmail(email: emailController.text);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Password reset email sent')),
       );

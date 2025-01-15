@@ -40,7 +40,6 @@ void main() async {
   BackgroundFetch.registerHeadlessTask(backgroundFetchHeadlessTask);
 }
 
-
 @pragma('vm:entry-point')
 void backgroundFetchHeadlessTask(HeadlessTask task) async {
   await Firebase.initializeApp();
@@ -102,6 +101,7 @@ void backgroundFetchHeadlessTask(HeadlessTask task) async {
 
   BackgroundFetch.finish(taskId);
 }
+
 class ChamkaYerngApp extends StatelessWidget {
   final bool isLoggedIn;
 

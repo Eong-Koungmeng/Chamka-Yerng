@@ -7,7 +7,6 @@ class UserModel {
 
   UserModel({required this.uid, required this.username, required this.email, this.profilePicture, this.phoneNumber});
 
-  // Convert a UserModel object to a map for saving to Firebase
   Map<String, dynamic> toMap() {
     return {
       'uid': uid,
@@ -18,7 +17,6 @@ class UserModel {
     };
   }
 
-  // Create a UserModel object from a map (useful when fetching data from Firebase)
   factory UserModel.fromMap(Map<dynamic, dynamic> map) {
     return UserModel(
       uid: map['uid'] ?? '',

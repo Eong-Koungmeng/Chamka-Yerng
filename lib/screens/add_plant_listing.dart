@@ -16,11 +16,8 @@ import '../utils/random.dart';
 
 class AddPlantListingScreen extends StatefulWidget {
   final String title;
-  const AddPlantListingScreen({
-    Key? key,
-    required this.title
-
-  }) : super(key: key);
+  const AddPlantListingScreen({Key? key, required this.title})
+      : super(key: key);
 
   @override
   State<AddPlantListingScreen> createState() => _AddPlantListingScreenState();
@@ -58,10 +55,8 @@ class _AddPlantListingScreenState extends State<AddPlantListingScreen> {
         return;
       }
 
-      final userSnapshot = await _database
-          .child('users')
-          .child(currentUser.uid)
-          .get();
+      final userSnapshot =
+          await _database.child('users').child(currentUser.uid).get();
 
       if (userSnapshot.exists) {
         final userData = userSnapshot.value as Map<dynamic, dynamic>;
@@ -97,10 +92,12 @@ class _AddPlantListingScreenState extends State<AddPlantListingScreen> {
       final int timestamp = DateTime.now().millisecondsSinceEpoch ~/ 1000;
       final imageFile = await http.MultipartFile.fromPath('file', imagePath);
 
-      final String stringToSign = "folder=$uploadFolder&timestamp=$timestamp$apiSecret";
+      final String stringToSign =
+          "folder=$uploadFolder&timestamp=$timestamp$apiSecret";
       final signature = sha1.convert(utf8.encode(stringToSign)).toString();
 
-      final url = Uri.parse("https://api.cloudinary.com/v1_1/$cloudName/image/upload");
+      final url =
+          Uri.parse("https://api.cloudinary.com/v1_1/$cloudName/image/upload");
       final request = http.MultipartRequest("POST", url)
         ..fields['api_key'] = apiKey
         ..fields['timestamp'] = timestamp.toString()
@@ -125,14 +122,16 @@ class _AddPlantListingScreenState extends State<AddPlantListingScreen> {
   }
 
   Future getImageFromCamera() async {
-    var image = await _picker.pickImage(source: ImageSource.camera, imageQuality: 25);
+    var image =
+        await _picker.pickImage(source: ImageSource.camera, imageQuality: 25);
     setState(() {
       _image = image;
     });
   }
 
   Future getImageFromGallery() async {
-    var image = await _picker.pickImage(source: ImageSource.gallery, imageQuality: 25);
+    var image =
+        await _picker.pickImage(source: ImageSource.gallery, imageQuality: 25);
     setState(() {
       _image = image;
     });
@@ -179,8 +178,10 @@ class _AddPlantListingScreenState extends State<AddPlantListingScreen> {
         createdAt: DateTime.now(),
       );
 
-      // Save to Firebase Realtime Database
-      await _database.child('plant_listings').child(listing.id).set(listing.toMap());
+      await _database
+          .child('plant_listings')
+          .child(listing.id)
+          .set(listing.toMap());
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Listing created successfully!')),
@@ -232,15 +233,15 @@ class _AddPlantListingScreenState extends State<AddPlantListingScreen> {
                       ),
                       child: _image == null
                           ? Center(
-                        child: Text(
-                          'No image selected',
-                          style: Theme.of(context).textTheme.bodyLarge,
-                        ),
-                      )
+                              child: Text(
+                                'No image selected',
+                                style: Theme.of(context).textTheme.bodyLarge,
+                              ),
+                            )
                           : Image.file(
-                        File(_image!.path),
-                        fit: BoxFit.fitHeight,
-                      ),
+                              File(_image!.path),
+                              fit: BoxFit.fitHeight,
+                            ),
                     ),
                     const SizedBox(height: 10),
                     Row(
