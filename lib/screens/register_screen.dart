@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../data/user_model.dart';
 import 'home_page.dart';
 
@@ -57,7 +57,7 @@ class RegisterPage extends StatelessWidget {
     } finally {
       Navigator.pushAndRemoveUntil(
         context,
-        MaterialPageRoute(builder: (context) => MyHomePage(title: 'Today')),
+        MaterialPageRoute(builder: (context) => MyHomePage(title: AppLocalizations.of(context)!.buttonToday)),
             (Route<dynamic> route) => false, // This removes all the previous routes
       );
     }
@@ -76,9 +76,9 @@ class RegisterPage extends StatelessWidget {
             children: [
               Image.asset('assets/Logo.png', height: 75),
               const SizedBox(height: 20),
-              const Text(
-                'Create a New Account',
-                style: TextStyle(
+              Text(
+                AppLocalizations.of(context)!.createNewAccount,
+                style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w600,
                   color: Color(0xff8CA37B),
@@ -88,7 +88,7 @@ class RegisterPage extends StatelessWidget {
               TextField(
                 controller: usernameController,
                 decoration: InputDecoration(
-                  labelText: 'Username',
+                  labelText: AppLocalizations.of(context)!.username,
                   filled: true,
                   fillColor: Colors.lightGreen[100],
                   enabledBorder: OutlineInputBorder(
@@ -114,7 +114,7 @@ class RegisterPage extends StatelessWidget {
               TextField(
                 controller: emailController,
                 decoration: InputDecoration(
-                  labelText: 'Email',
+                  labelText: AppLocalizations.of(context)!.email,
                   filled: true,
                   fillColor: Colors.lightGreen[100],
                   enabledBorder: OutlineInputBorder(
@@ -142,7 +142,7 @@ class RegisterPage extends StatelessWidget {
                 obscureText: true,
                 controller: passwordController,
                 decoration: InputDecoration(
-                  labelText: 'Password',
+                  labelText: AppLocalizations.of(context)!.password,
                   filled: true,
                   fillColor: Colors.lightGreen[100],
                   enabledBorder: OutlineInputBorder(
@@ -169,7 +169,7 @@ class RegisterPage extends StatelessWidget {
                 obscureText: true,
                 controller: confirmPasswordController,
                 decoration: InputDecoration(
-                  labelText: 'Confirm Password',
+                  labelText: AppLocalizations.of(context)!.confirmPassword,
                   filled: true,
                   fillColor: Colors.lightGreen[100],
                   enabledBorder: OutlineInputBorder(
@@ -201,8 +201,8 @@ class RegisterPage extends StatelessWidget {
                   ),
                   padding: EdgeInsets.symmetric(vertical: 12, horizontal: 32),
                 ),
-                child: const Text(
-                  'Register',
+                child: Text(
+                  AppLocalizations.of(context)!.register,
                   style: TextStyle(
                     fontSize: 18.0,
                     fontWeight: FontWeight.bold,

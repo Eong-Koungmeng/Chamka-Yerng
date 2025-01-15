@@ -7,7 +7,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../data/user_model.dart';
 import '../provider/app_settings.dart';
 import 'login_screen.dart';
@@ -104,7 +104,7 @@ class _SettingsScreen extends State<SettingsScreen> {
             ),
             actions: [
               TextButton(
-                child: Text("cancel"),
+                child: Text("Cancel"),
                 onPressed: () => Navigator.of(context).pop(),
               ),
               TextButton(
@@ -175,7 +175,7 @@ class _SettingsScreen extends State<SettingsScreen> {
                   ListTile(
                     trailing: const Icon(Icons.open_in_new),
                     leading: const Icon(Icons.person, color: Colors.blue),
-                    title: const Text("Profile"),
+                    title: Text(AppLocalizations.of(context)!.profile),
                     subtitle: Text(
                         currentUser?.email ?? "Loading..."), // Display username
                     onTap: () async {
@@ -204,7 +204,7 @@ class _SettingsScreen extends State<SettingsScreen> {
                   ),
                   ListTile(
                     leading: const Icon(Icons.language, color: Colors.green),
-                    title: Text("language"),
+                    title: Text(AppLocalizations.of(context)!.language),
                     subtitle: Text(appSettings.locale.languageCode == 'en'
                         ? 'English'
                         : 'Khmer'),
@@ -218,10 +218,10 @@ class _SettingsScreen extends State<SettingsScreen> {
                   ListTile(
                     leading:
                         const Icon(Icons.brightness_6, color: Colors.amber),
-                    title: Text("theme"),
+                    title: Text(AppLocalizations.of(context)!.theme),
                     subtitle: Text(appSettings.themeMode == ThemeMode.dark
-                        ? 'Dark'
-                        : 'Light'),
+                        ? AppLocalizations.of(context)!.dark
+                        : AppLocalizations.of(context)!.light),
                     onTap: () async {
                       final newThemeMode =
                           appSettings.themeMode == ThemeMode.dark
