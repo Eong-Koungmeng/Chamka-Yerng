@@ -22,6 +22,12 @@ class _ShopScreenState extends State<ShopScreen> with SingleTickerProviderStateM
   bool _isAscending = true;
   final TextEditingController _searchController = TextEditingController();
 
+  double _minPrice = 0.0; // Minimum price
+  double _maxPrice = 1000.0; // Maximum price
+  double _selectedMinPrice = 0.0;
+  double _selectedMaxPrice = 1000.0;
+  bool _isPriceFilterActive = false;
+
   @override
   void initState() {
     print("init shop");
@@ -68,10 +74,20 @@ class _ShopScreenState extends State<ShopScreen> with SingleTickerProviderStateM
     List<PlantListing> filteredListings = _allPlantListings;
 
     // Apply search query filter
+    // Apply search query filter
     if (_searchQuery.isNotEmpty) {
       filteredListings = filteredListings
           .where((listing) =>
           listing.title.toLowerCase().contains(_searchQuery.toLowerCase()))
+          .toList();
+    }
+
+    // Apply price range filter only if active
+    if (_isPriceFilterActive) {
+      filteredListings = filteredListings
+          .where((listing) =>
+      (listing.price ?? 0.0) >= _selectedMinPrice &&
+          (listing.price ?? 0.0) <= _selectedMaxPrice)
           .toList();
     }
 
@@ -150,7 +166,63 @@ class _ShopScreenState extends State<ShopScreen> with SingleTickerProviderStateM
               ),
 
               const SizedBox(height: 15),
-              // Filters Row
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Toggle Button for Price Filter
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Filter by Price:',
+                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        ),
+                        Switch(
+                          value: _isPriceFilterActive,
+                          onChanged: (value) {
+                            setState(() {
+                              _isPriceFilterActive = value;
+                              _applyFiltersAndSorting(); // Reapply filters when toggled
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+
+                    // Price Range Slider (Shown only when filter is active)
+                    if (_isPriceFilterActive)
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          RangeSlider(
+                            values: RangeValues(_selectedMinPrice, _selectedMaxPrice),
+                            min: _minPrice,
+                            max: _maxPrice,
+                            divisions: 20,
+                            labels: RangeLabels(
+                              '\$${_selectedMinPrice.toStringAsFixed(2)}',
+                              '\$${_selectedMaxPrice.toStringAsFixed(2)}',
+                            ),
+                            onChanged: (values) {
+                              setState(() {
+                                _selectedMinPrice = values.start;
+                                _selectedMaxPrice = values.end;
+                                _applyFiltersAndSorting(); // Reapply filters when price range changes
+                              });
+                            },
+                          ),
+                          Text(
+                            'Selected Range: \$${_selectedMinPrice.toStringAsFixed(2)} - \$${_selectedMaxPrice.toStringAsFixed(2)}',
+                            style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                          ),
+                        ],
+                      ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 15),
               TabBar(
                 controller: _tabController,
                 onTap: (index) => _handleTabChange(),
