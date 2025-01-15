@@ -568,7 +568,12 @@ class _ManagePlantScreen extends State<ManagePlantScreen> {
               // Save the plant
               await garden.addOrUpdatePlant(newPlant);
 
-              Navigator.pop(context, true);
+              if (widget.update) {
+                Navigator.pop(context);
+                Navigator.pop(context, true);
+              } else {
+                Navigator.pop(context, true);
+              }
             } catch (e) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(content: Text('Error fetching listings: $e')),
