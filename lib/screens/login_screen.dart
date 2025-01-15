@@ -35,7 +35,8 @@ class LoginPage extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(40.0),
           child: Column(
-            mainAxisSize: MainAxisSize.min, // Ensures the Column takes minimum space vertically
+            mainAxisSize: MainAxisSize
+                .min, // Ensures the Column takes minimum space vertically
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Image.asset('assets/Logo.png', height: 75),
@@ -56,11 +57,14 @@ class LoginPage extends StatelessWidget {
                   filled: true,
                   fillColor: Colors.lightGreen[100], // Light green background
                   enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12.0), // Rounded corners
-                    borderSide: BorderSide.none, // No underline when not focused
+                    borderRadius:
+                        BorderRadius.circular(12.0), // Rounded corners
+                    borderSide:
+                        BorderSide.none, // No underline when not focused
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12.0), // Rounded corners
+                    borderRadius:
+                        BorderRadius.circular(12.0), // Rounded corners
                     borderSide: BorderSide(
                       color: Colors.green, // Green border when focused
                       width: 2.0,
@@ -109,7 +113,8 @@ class LoginPage extends StatelessWidget {
                 child: TextButton(
                   onPressed: () => Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => ForgotPasswordPage()),
+                    MaterialPageRoute(
+                        builder: (context) => ForgotPasswordPage()),
                   ),
                   child: Text(
                     'Forgot Password?',
@@ -123,7 +128,8 @@ class LoginPage extends StatelessWidget {
 
               const SizedBox(height: 10),
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween, // Ensures the Column takes minimum space vertically
+                mainAxisAlignment: MainAxisAlignment
+                    .spaceBetween, // Ensures the Column takes minimum space vertically
                 children: [
                   Expanded(
                     child: ElevatedButton(
@@ -131,9 +137,11 @@ class LoginPage extends StatelessWidget {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Color(0xFF88C988), // Green background
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12.0), // Rounded corners
+                          borderRadius:
+                              BorderRadius.circular(12.0), // Rounded corners
                         ),
-                        padding: EdgeInsets.symmetric(vertical: 12, horizontal: 32),
+                        padding:
+                            EdgeInsets.symmetric(vertical: 12, horizontal: 32),
                       ),
                       child: const Text(
                         'Login',
@@ -155,9 +163,11 @@ class LoginPage extends StatelessWidget {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Color(0xFF88C988), // Green background
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12.0), // Rounded corners
+                          borderRadius:
+                              BorderRadius.circular(12.0), // Rounded corners
                         ),
-                        padding: EdgeInsets.symmetric(vertical: 12, horizontal: 32),
+                        padding:
+                            EdgeInsets.symmetric(vertical: 12, horizontal: 32),
                       ),
                       child: const Text(
                         'Register',

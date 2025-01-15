@@ -286,50 +286,51 @@ class _MyHomePageState extends State<MyHomePage> {
               : const SizedBox.shrink(),
           _currentPage == Page.shop
               ? IconButton(
-              icon: const Icon(Icons.add),
-              iconSize: 25,
-              color: Theme.of(context).colorScheme.primary,
-              tooltip: AppLocalizations.of(context)!.tooltipNewPlant,
-              onPressed: () async {
-                final result = await Navigator.push(
-                    context,
-                    MaterialPageRoute<bool>(
-                      builder: (context) => const AddPlantListingScreen(title: "Add Listing"),
-                    ));
-                if (result == true) {
-                  setState(() {
-                    _loadPlants();
-                  });
-                }
-              })
+                  icon: const Icon(Icons.add),
+                  iconSize: 25,
+                  color: Theme.of(context).colorScheme.primary,
+                  tooltip: AppLocalizations.of(context)!.tooltipNewPlant,
+                  onPressed: () async {
+                    final result = await Navigator.push(
+                        context,
+                        MaterialPageRoute<bool>(
+                          builder: (context) =>
+                              const AddPlantListingScreen(title: "Add Listing"),
+                        ));
+                    if (result == true) {
+                      setState(() {
+                        _loadPlants();
+                      });
+                    }
+                  })
               : const SizedBox.shrink(),
           _currentPage == Page.shop
               ? IconButton(
-              icon: const Icon(Icons.dataset),
-              iconSize: 25,
-              color: Theme.of(context).colorScheme.primary,
-              tooltip: "My listing",
-              onPressed: () async {
-                await Navigator.push(
-                    context,
-                    MaterialPageRoute<void>(
-                      builder: (context) => const MyPlantListing(),
-                    ));
-              })
+                  icon: const Icon(Icons.dataset),
+                  iconSize: 25,
+                  color: Theme.of(context).colorScheme.primary,
+                  tooltip: "My listing",
+                  onPressed: () async {
+                    await Navigator.push(
+                        context,
+                        MaterialPageRoute<void>(
+                          builder: (context) => const MyPlantListing(),
+                        ));
+                  })
               : const SizedBox.shrink(),
           _currentPage == Page.shop
               ? IconButton(
-              icon: const Icon(Icons.favorite),
-              iconSize: 25,
-              color: Theme.of(context).colorScheme.primary,
-              tooltip: "My Favorite",
-              onPressed: () async {
-                await Navigator.push(
-                    context,
-                    MaterialPageRoute<void>(
-                      builder: (context) => const MyFavoriteScreen(),
-                    ));
-              })
+                  icon: const Icon(Icons.favorite),
+                  iconSize: 25,
+                  color: Theme.of(context).colorScheme.primary,
+                  tooltip: "My Favorite",
+                  onPressed: () async {
+                    await Navigator.push(
+                        context,
+                        MaterialPageRoute<void>(
+                          builder: (context) => const MyFavoriteScreen(),
+                        ));
+                  })
               : const SizedBox.shrink(),
           IconButton(
             icon: const Icon(Icons.settings),
@@ -353,19 +354,19 @@ class _MyHomePageState extends State<MyHomePage> {
       body: _isLoading
           ? Center(child: CircularProgressIndicator())
           : _currentPage == Page.shop
-          ? ShopScreen()
-          : _plants.isEmpty
-          ? noPlants()
-          : ResponsiveGridList(
-        horizontalGridSpacing: 10,
-        verticalGridSpacing: 10,
-        horizontalGridMargin: 10,
-        verticalGridMargin: 10,
-        minItemWidth: 150,
-        minItemsPerRow: 2,
-        maxItemsPerRow: 6,
-        children: _buildPlantCards(context),
-      ),
+              ? ShopScreen()
+              : _plants.isEmpty
+                  ? noPlants()
+                  : ResponsiveGridList(
+                      horizontalGridSpacing: 10,
+                      verticalGridSpacing: 10,
+                      horizontalGridMargin: 10,
+                      verticalGridMargin: 10,
+                      minItemWidth: 150,
+                      minItemsPerRow: 2,
+                      maxItemsPerRow: 6,
+                      children: _buildPlantCards(context),
+                    ),
       bottomNavigationBar: NavigationBar(
         onDestinationSelected: (int index) {
           setState(() {
@@ -389,8 +390,8 @@ class _MyHomePageState extends State<MyHomePage> {
             label: AppLocalizations.of(context)!.buttonGarden,
           ),
           NavigationDestination(
-            selectedIcon: Icon(Icons.store,
-                color: Theme.of(context).colorScheme.surface),
+            selectedIcon:
+                Icon(Icons.store, color: Theme.of(context).colorScheme.surface),
             icon: const Icon(Icons.store_outlined),
             label: "Shop",
           ),

@@ -36,7 +36,8 @@ class _SettingsScreen extends State<SettingsScreen> {
 
       if (snapshot.exists) {
         setState(() {
-          currentUser = UserModel.fromMap(Map<String, dynamic>.from(snapshot.value as Map));
+          currentUser = UserModel.fromMap(
+              Map<String, dynamic>.from(snapshot.value as Map));
         });
       } else {
         setState(() {
@@ -57,7 +58,7 @@ class _SettingsScreen extends State<SettingsScreen> {
         Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(builder: (context) => LoginPage()),
-              (route) => false,
+          (route) => false,
         );
       }
     } catch (e) {
@@ -134,6 +135,7 @@ class _SettingsScreen extends State<SettingsScreen> {
       isDarkTheme = prefs.getBool('isDarkTheme') ?? false;
     });
   }
+
   @override
   void initState() {
     super.initState();
@@ -174,9 +176,9 @@ class _SettingsScreen extends State<SettingsScreen> {
                     trailing: const Icon(Icons.open_in_new),
                     leading: const Icon(Icons.person, color: Colors.blue),
                     title: const Text("Profile"),
-                    subtitle: Text(currentUser?.email ?? "Loading..."), // Display username
-                    onTap: ()
-                    async {
+                    subtitle: Text(
+                        currentUser?.email ?? "Loading..."), // Display username
+                    onTap: () async {
                       await fetchUserDetails();
                       Navigator.push(
                         context,
@@ -194,7 +196,7 @@ class _SettingsScreen extends State<SettingsScreen> {
                     title: Text(AppLocalizations.of(context)!.notifyEvery),
                     subtitle: notificationTempo != 0
                         ? Text((notificationTempo).round().toString() +
-                        " ${AppLocalizations.of(context)!.minutes}")
+                            " ${AppLocalizations.of(context)!.minutes}")
                         : Text(AppLocalizations.of(context)!.never),
                     onTap: () {
                       _showIntegerDialog();
@@ -213,18 +215,18 @@ class _SettingsScreen extends State<SettingsScreen> {
                       await appSettings.updateLocale(newLocale);
                     },
                   ),
-
                   ListTile(
-                    leading: const Icon(Icons.brightness_6, color: Colors.amber),
+                    leading:
+                        const Icon(Icons.brightness_6, color: Colors.amber),
                     title: Text("theme"),
                     subtitle: Text(appSettings.themeMode == ThemeMode.dark
                         ? 'Dark'
                         : 'Light'),
                     onTap: () async {
-                      final newThemeMode = appSettings.themeMode ==
-                          ThemeMode.dark
-                          ? ThemeMode.light
-                          : ThemeMode.dark;
+                      final newThemeMode =
+                          appSettings.themeMode == ThemeMode.dark
+                              ? ThemeMode.light
+                              : ThemeMode.dark;
                       await appSettings.updateThemeMode(newThemeMode);
                     },
                   ),
@@ -244,7 +246,7 @@ class _SettingsScreen extends State<SettingsScreen> {
                     trailing: const Icon(Icons.arrow_right),
                     leading: const Icon(Icons.logout, color: Colors.red),
                     title:
-                    Text(AppLocalizations.of(context)?.logout ?? 'Logout'),
+                        Text(AppLocalizations.of(context)?.logout ?? 'Logout'),
                     onTap: () => _handleLogout(context),
                   ),
                 ]),

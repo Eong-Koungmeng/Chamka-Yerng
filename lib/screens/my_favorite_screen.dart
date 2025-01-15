@@ -23,6 +23,7 @@ class _MyFavoriteScreenState extends State<MyFavoriteScreen> {
     super.initState();
     _loadUserData();
   }
+
   Future<void> _loadUserData() async {
     try {
       setState(() {
@@ -36,10 +37,8 @@ class _MyFavoriteScreenState extends State<MyFavoriteScreen> {
         return;
       }
 
-      final userSnapshot = await _database
-          .child('users')
-          .child(currentUser.uid)
-          .get();
+      final userSnapshot =
+          await _database.child('users').child(currentUser.uid).get();
 
       if (userSnapshot.exists) {
         final userData = userSnapshot.value as Map<dynamic, dynamic>;
@@ -75,15 +74,13 @@ class _MyFavoriteScreenState extends State<MyFavoriteScreen> {
       }
 
       // Get favorite listing IDs
-      final favoritesSnapshot = await _database
-          .child('favorites')
-          .child(userId)
-          .get();
+      final favoritesSnapshot =
+          await _database.child('favorites').child(userId).get();
 
       final List<String> favoriteIds = [];
       if (favoritesSnapshot.exists) {
         final Map<dynamic, dynamic> favorites =
-        favoritesSnapshot.value as Map<dynamic, dynamic>;
+            favoritesSnapshot.value as Map<dynamic, dynamic>;
         favoriteIds.addAll(favorites.keys.cast<String>());
       }
 
@@ -96,8 +93,8 @@ class _MyFavoriteScreenState extends State<MyFavoriteScreen> {
       final snapshot = await _database.child('plant_listings').get();
       if (snapshot.exists) {
         final listings = snapshot.children
-            .map((data) => PlantListing.fromMap(
-            data.value as Map<dynamic, dynamic>))
+            .map((data) =>
+                PlantListing.fromMap(data.value as Map<dynamic, dynamic>))
             .where((listing) => favoriteIds.contains(listing.id))
             .toList();
 
@@ -116,7 +113,7 @@ class _MyFavoriteScreenState extends State<MyFavoriteScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
         resizeToAvoidBottomInset: false,
-        appBar:  AppBar(
+        appBar: AppBar(
           toolbarHeight: 70,
           title: Text("Favorite Listings"),
           elevation: 0.0,
@@ -124,32 +121,33 @@ class _MyFavoriteScreenState extends State<MyFavoriteScreen> {
           shadowColor: Colors.transparent,
           titleTextStyle: Theme.of(context).textTheme.displayLarge,
         ),
-        body:  _isLoading
-            ? Center(child: CircularProgressIndicator()): _allPlantListings.isEmpty
-            ? const Center(child: Text('No plants found.'))
-            :
-        RefreshIndicator(
-          onRefresh: _fetchPlantListings,
-          child: Column(
-            children: [
-              Expanded(
-                child: _allPlantListings.isEmpty
-                    ? const Center(child: Text('No plants found.'))
-                    : ListView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                  itemCount: _allPlantListings.length,
-                  itemBuilder: (context, index) {
-                    final listing = _allPlantListings[index];
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 5),
-                      child: _buildPlantCard(listing),
-                    );
-                  },
-                ),
-              ),
-            ],
-          ),
-        ));
+        body: _isLoading
+            ? Center(child: CircularProgressIndicator())
+            : _allPlantListings.isEmpty
+                ? const Center(child: Text('No plants found.'))
+                : RefreshIndicator(
+                    onRefresh: _fetchPlantListings,
+                    child: Column(
+                      children: [
+                        Expanded(
+                          child: _allPlantListings.isEmpty
+                              ? const Center(child: Text('No plants found.'))
+                              : ListView.builder(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 10, vertical: 10),
+                                  itemCount: _allPlantListings.length,
+                                  itemBuilder: (context, index) {
+                                    final listing = _allPlantListings[index];
+                                    return Padding(
+                                      padding: const EdgeInsets.only(bottom: 5),
+                                      child: _buildPlantCard(listing),
+                                    );
+                                  },
+                                ),
+                        ),
+                      ],
+                    ),
+                  ));
   }
 
   Widget _buildPlantCard(PlantListing listing) {
@@ -189,10 +187,11 @@ class _MyFavoriteScreenState extends State<MyFavoriteScreen> {
                       height: 100,
                       child: listing.imageUrl != null
                           ? Image.network(
-                        listing.imageUrl,
-                        fit: BoxFit.cover,
-                      )
-                          : const Center(child: Icon(Icons.image_not_supported)),
+                              listing.imageUrl,
+                              fit: BoxFit.cover,
+                            )
+                          : const Center(
+                              child: Icon(Icons.image_not_supported)),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -238,7 +237,8 @@ class _MyFavoriteScreenState extends State<MyFavoriteScreen> {
                       if (isFavorite) {
                         await _favoritesRef.remove();
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Removed from Favorites')),
+                          const SnackBar(
+                              content: Text('Removed from Favorites')),
                         );
                       } else {
                         await _favoritesRef.set(true);

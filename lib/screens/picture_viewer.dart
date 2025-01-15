@@ -18,27 +18,27 @@ class PictureViewer extends StatelessWidget {
         maxScale: 2,
         child: picture!.isNotEmpty
             ? Image.network(
-          picture!,
-          fit: BoxFit.cover, // Adjusts how the image fits the widget
-          loadingBuilder: (context, child, loadingProgress) {
-            if (loadingProgress == null) return child;
-            return Center(
-              child: CircularProgressIndicator(
-                value: loadingProgress.expectedTotalBytes != null
-                    ? loadingProgress.cumulativeBytesLoaded /
-                    (loadingProgress.expectedTotalBytes ?? 1)
-                    : null,
-              ),
-            );
-          },
-          errorBuilder: (context, error, stackTrace) {
-            return const Icon(
-              Icons.error,
-              size: 50,
-              color: Colors.red,
-            );
-          },
-        )
+                picture!,
+                fit: BoxFit.cover, // Adjusts how the image fits the widget
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) return child;
+                  return Center(
+                    child: CircularProgressIndicator(
+                      value: loadingProgress.expectedTotalBytes != null
+                          ? loadingProgress.cumulativeBytesLoaded /
+                              (loadingProgress.expectedTotalBytes ?? 1)
+                          : null,
+                    ),
+                  );
+                },
+                errorBuilder: (context, error, stackTrace) {
+                  return const Icon(
+                    Icons.error,
+                    size: 50,
+                    color: Colors.red,
+                  );
+                },
+              )
             : const Text("No image URL provided."),
       ),
     );

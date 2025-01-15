@@ -9,7 +9,8 @@ class RegisterPage extends StatelessWidget {
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final TextEditingController confirmPasswordController = TextEditingController();
+  final TextEditingController confirmPasswordController =
+      TextEditingController();
 
   RegisterPage({super.key});
 
@@ -23,7 +24,8 @@ class RegisterPage extends StatelessWidget {
 
     try {
       // Create a new user in Firebase Auth
-      UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+      UserCredential userCredential =
+          await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: emailController.text,
         password: passwordController.text,
       );
@@ -36,20 +38,20 @@ class RegisterPage extends StatelessWidget {
 
         // Create a UserModel instance
         UserModel newUser = UserModel(
-          uid: uid,
-          username: usernameController.text,
-          email: emailController.text,
-          phoneNumber: '',
-          profilePicture: ''
-        );
+            uid: uid,
+            username: usernameController.text,
+            email: emailController.text,
+            phoneNumber: '',
+            profilePicture: '');
 
-        DatabaseReference userRef = FirebaseDatabase.instance.ref().child('users').child(uid);
+        DatabaseReference userRef =
+            FirebaseDatabase.instance.ref().child('users').child(uid);
         await userRef.set(newUser.toMap());
 
         Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(builder: (context) => MyHomePage(title: 'Today')),
-              (route) => false, // This removes all previous routes
+          (route) => false, // This removes all previous routes
         );
       }
     } catch (e) {
@@ -58,8 +60,6 @@ class RegisterPage extends StatelessWidget {
       );
     }
   }
-
-
 
   @override
   Widget build(BuildContext context) {

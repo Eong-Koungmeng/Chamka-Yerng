@@ -15,6 +15,7 @@ class CarePlantScreen extends StatefulWidget {
   @override
   State<CarePlantScreen> createState() => _CarePlantScreen();
 }
+
 class _CarePlantScreen extends State<CarePlantScreen> {
   int periodicityInHours = 1;
   Map<Care, bool?> careCheck = {};
@@ -73,6 +74,7 @@ class _CarePlantScreen extends State<CarePlantScreen> {
       },
     );
   }
+
   List<CheckboxListTile> _buildCares(BuildContext context, Plant plant) {
     return plant.cares.map((care) {
       int daysToCare =
@@ -144,8 +146,8 @@ class _CarePlantScreen extends State<CarePlantScreen> {
                         context,
                         MaterialPageRoute(
                             builder: (context) => PictureViewer(
-                              picture: plant.picture,
-                            )),
+                                  picture: plant.picture,
+                                )),
                       );
                     },
                     child: SizedBox(
@@ -156,27 +158,34 @@ class _CarePlantScreen extends State<CarePlantScreen> {
                             height: 220,
                             child: plant.picture!.isNotEmpty
                                 ? Image.network(
-                              plant.picture!,
-                              fit: BoxFit.cover, // Adjusts how the image fits the widget
-                              loadingBuilder: (context, child, loadingProgress) {
-                                if (loadingProgress == null) return child;
-                                return Center(
-                                  child: CircularProgressIndicator(
-                                    value: loadingProgress.expectedTotalBytes != null
-                                        ? loadingProgress.cumulativeBytesLoaded /
-                                        (loadingProgress.expectedTotalBytes ?? 1)
-                                        : null,
-                                  ),
-                                );
-                              },
-                              errorBuilder: (context, error, stackTrace) {
-                                return const Icon(
-                                  Icons.error,
-                                  size: 50,
-                                  color: Colors.red,
-                                );
-                              },
-                            )
+                                    plant.picture!,
+                                    fit: BoxFit
+                                        .cover, // Adjusts how the image fits the widget
+                                    loadingBuilder:
+                                        (context, child, loadingProgress) {
+                                      if (loadingProgress == null) return child;
+                                      return Center(
+                                        child: CircularProgressIndicator(
+                                          value: loadingProgress
+                                                      .expectedTotalBytes !=
+                                                  null
+                                              ? loadingProgress
+                                                      .cumulativeBytesLoaded /
+                                                  (loadingProgress
+                                                          .expectedTotalBytes ??
+                                                      1)
+                                              : null,
+                                        ),
+                                      );
+                                    },
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return const Icon(
+                                        Icons.error,
+                                        size: 50,
+                                        color: Colors.red,
+                                      );
+                                    },
+                                  )
                                 : const Text("No image URL provided."),
                           ),
                         ),

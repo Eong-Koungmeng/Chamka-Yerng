@@ -11,7 +11,8 @@ class ShopScreen extends StatefulWidget {
   State<ShopScreen> createState() => _ShopScreenState();
 }
 
-class _ShopScreenState extends State<ShopScreen> with SingleTickerProviderStateMixin{
+class _ShopScreenState extends State<ShopScreen>
+    with SingleTickerProviderStateMixin {
   final DatabaseReference _database = FirebaseDatabase.instance.ref();
   List<PlantListing> _allPlantListings = [];
   List<PlantListing> _displayedListings = [];
@@ -38,7 +39,8 @@ class _ShopScreenState extends State<ShopScreen> with SingleTickerProviderStateM
 
   @override
   void dispose() {
-    _searchController.dispose(); // Dispose of the controller to avoid memory leaks
+    _searchController
+        .dispose(); // Dispose of the controller to avoid memory leaks
     super.dispose();
   }
 
@@ -47,7 +49,10 @@ class _ShopScreenState extends State<ShopScreen> with SingleTickerProviderStateM
       final snapshot = await _database.child('plant_listings').get();
       if (snapshot.exists) {
         final Iterable<DataSnapshot> data = snapshot.children;
-        final listings = data.map((data) => PlantListing.fromMap(data.value as Map<dynamic, dynamic>)).toList();
+        final listings = data
+            .map((data) =>
+                PlantListing.fromMap(data.value as Map<dynamic, dynamic>))
+            .toList();
 
         setState(() {
           _allPlantListings = listings;
@@ -78,7 +83,7 @@ class _ShopScreenState extends State<ShopScreen> with SingleTickerProviderStateM
     if (_searchQuery.isNotEmpty) {
       filteredListings = filteredListings
           .where((listing) =>
-          listing.title.toLowerCase().contains(_searchQuery.toLowerCase()))
+              listing.title.toLowerCase().contains(_searchQuery.toLowerCase()))
           .toList();
     }
 
@@ -86,8 +91,8 @@ class _ShopScreenState extends State<ShopScreen> with SingleTickerProviderStateM
     if (_isPriceFilterActive) {
       filteredListings = filteredListings
           .where((listing) =>
-      (listing.price ?? 0.0) >= _selectedMinPrice &&
-          (listing.price ?? 0.0) <= _selectedMaxPrice)
+              (listing.price ?? 0.0) >= _selectedMinPrice &&
+              (listing.price ?? 0.0) <= _selectedMaxPrice)
           .toList();
     }
 
@@ -111,6 +116,7 @@ class _ShopScreenState extends State<ShopScreen> with SingleTickerProviderStateM
       _displayedListings = filteredListings;
     });
   }
+
   void _filterListings(String query) {
     setState(() {
       _searchQuery = query;
@@ -118,153 +124,160 @@ class _ShopScreenState extends State<ShopScreen> with SingleTickerProviderStateM
     });
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     return RefreshIndicator(
-        onRefresh: _fetchPlantListings,
-        child: Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Search Bar
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 5.0),
-                child: TextField(
-                  onChanged: _filterListings,
-                  controller: _searchController,
-                  decoration: InputDecoration(
-                    hintText: 'Search plants...',
-                    prefixIcon: const Icon(Icons.search),
-                    suffixIcon: _searchController.text.isNotEmpty
-                        ? IconButton(
-                      icon: const Icon(Icons.clear),
-                      onPressed: () {
-                        _searchController.clear();
-                        _filterListings('');
-                      },
-                    )
-                        : null,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20),
-                      borderSide: const BorderSide(color: Colors.grey), // Border color
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20),
-                      borderSide: const BorderSide(color: Colors.grey, width: 1.5), // Default border
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20),
-                      borderSide: const BorderSide(color: Colors.blue, width: 2), // Focused border
+      onRefresh: _fetchPlantListings,
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Search Bar
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                  child: TextField(
+                    onChanged: _filterListings,
+                    controller: _searchController,
+                    decoration: InputDecoration(
+                      hintText: 'Search plants...',
+                      prefixIcon: const Icon(Icons.search),
+                      suffixIcon: _searchController.text.isNotEmpty
+                          ? IconButton(
+                              icon: const Icon(Icons.clear),
+                              onPressed: () {
+                                _searchController.clear();
+                                _filterListings('');
+                              },
+                            )
+                          : null,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(20),
+                        borderSide: const BorderSide(
+                            color: Colors.grey), // Border color
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(20),
+                        borderSide: const BorderSide(
+                            color: Colors.grey, width: 1.5), // Default border
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(20),
+                        borderSide: const BorderSide(
+                            color: Colors.blue, width: 2), // Focused border
+                      ),
                     ),
                   ),
                 ),
-              ),
 
-              const SizedBox(height: 15),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Toggle Button for Price Filter
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Filter by Price:',
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                        ),
-                        Switch(
-                          value: _isPriceFilterActive,
-                          onChanged: (value) {
-                            setState(() {
-                              _isPriceFilterActive = value;
-                              _applyFiltersAndSorting(); // Reapply filters when toggled
-                            });
-                          },
-                        ),
-                      ],
-                    ),
-
-                    // Price Range Slider (Shown only when filter is active)
-                    if (_isPriceFilterActive)
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                const SizedBox(height: 15),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Toggle Button for Price Filter
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          RangeSlider(
-                            values: RangeValues(_selectedMinPrice, _selectedMaxPrice),
-                            min: _minPrice,
-                            max: _maxPrice,
-                            divisions: 20,
-                            labels: RangeLabels(
-                              '\$${_selectedMinPrice.toStringAsFixed(2)}',
-                              '\$${_selectedMaxPrice.toStringAsFixed(2)}',
-                            ),
-                            onChanged: (values) {
+                          Text(
+                            'Filter by Price:',
+                            style: TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.bold),
+                          ),
+                          Switch(
+                            value: _isPriceFilterActive,
+                            onChanged: (value) {
                               setState(() {
-                                _selectedMinPrice = values.start;
-                                _selectedMaxPrice = values.end;
-                                _applyFiltersAndSorting(); // Reapply filters when price range changes
+                                _isPriceFilterActive = value;
+                                _applyFiltersAndSorting(); // Reapply filters when toggled
                               });
                             },
                           ),
-                          Text(
-                            'Selected Range: \$${_selectedMinPrice.toStringAsFixed(2)} - \$${_selectedMaxPrice.toStringAsFixed(2)}',
-                            style: TextStyle(fontSize: 14, color: Colors.grey[600]),
-                          ),
                         ],
                       ),
+
+                      // Price Range Slider (Shown only when filter is active)
+                      if (_isPriceFilterActive)
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            RangeSlider(
+                              values: RangeValues(
+                                  _selectedMinPrice, _selectedMaxPrice),
+                              min: _minPrice,
+                              max: _maxPrice,
+                              divisions: 20,
+                              labels: RangeLabels(
+                                '\$${_selectedMinPrice.toStringAsFixed(2)}',
+                                '\$${_selectedMaxPrice.toStringAsFixed(2)}',
+                              ),
+                              onChanged: (values) {
+                                setState(() {
+                                  _selectedMinPrice = values.start;
+                                  _selectedMaxPrice = values.end;
+                                  _applyFiltersAndSorting(); // Reapply filters when price range changes
+                                });
+                              },
+                            ),
+                            Text(
+                              'Selected Range: \$${_selectedMinPrice.toStringAsFixed(2)} - \$${_selectedMaxPrice.toStringAsFixed(2)}',
+                              style: TextStyle(
+                                  fontSize: 14, color: Colors.grey[600]),
+                            ),
+                          ],
+                        ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 15),
+                TabBar(
+                  controller: _tabController,
+                  onTap: (index) => _handleTabChange(),
+                  labelColor: Colors.blue,
+                  unselectedLabelColor: Colors.grey,
+                  indicatorColor: Colors.blue,
+                  tabs: const [
+                    Tab(text: 'Latest'),
+                    Tab(text: 'Popular'),
+                    Tab(text: 'Price ↑'),
+                    Tab(text: 'Price ↓'),
                   ],
                 ),
-              ),
-              const SizedBox(height: 15),
-              TabBar(
-                controller: _tabController,
-                onTap: (index) => _handleTabChange(),
-                labelColor: Colors.blue,
-                unselectedLabelColor: Colors.grey,
-                indicatorColor: Colors.blue,
-                tabs: const [
-                  Tab(text: 'Latest'),
-                  Tab(text: 'Popular'),
-                  Tab(text: 'Price ↑'),
-                  Tab(text: 'Price ↓'),
-                ],
-              ),
-            ],
-          ),
-        ),
-        _isLoading
-            ? Center(child: CircularProgressIndicator()): _displayedListings.isEmpty
-            ? const Center(child: Text('No plants found.'))
-            :
-        Expanded(
-          child: _isLoading
-              ? const Center(child: CircularProgressIndicator())
-              : _displayedListings.isEmpty
-              ? const Center(child: Text('No plants found.'))
-              : GridView.builder(
-            padding: const EdgeInsets.symmetric(horizontal: 10),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              crossAxisSpacing: 10,
-              mainAxisSpacing: 10,
-              childAspectRatio: 0.75,
+              ],
             ),
-            itemCount: _displayedListings.length,
-            itemBuilder: (context, index) {
-              final listing = _displayedListings[index];
-              return _buildPlantCard(listing);
-            },
           ),
-        ),
-      ],
-        ),);
+          _isLoading
+              ? Center(child: CircularProgressIndicator())
+              : _displayedListings.isEmpty
+                  ? const Center(child: Text('No plants found.'))
+                  : Expanded(
+                      child: _isLoading
+                          ? const Center(child: CircularProgressIndicator())
+                          : _displayedListings.isEmpty
+                              ? const Center(child: Text('No plants found.'))
+                              : GridView.builder(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 10),
+                                  gridDelegate:
+                                      const SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 2,
+                                    crossAxisSpacing: 10,
+                                    mainAxisSpacing: 10,
+                                    childAspectRatio: 0.75,
+                                  ),
+                                  itemCount: _displayedListings.length,
+                                  itemBuilder: (context, index) {
+                                    final listing = _displayedListings[index];
+                                    return _buildPlantCard(listing);
+                                  },
+                                ),
+                    ),
+        ],
+      ),
+    );
   }
 
   Widget _buildPlantCard(PlantListing listing) {
@@ -287,13 +300,14 @@ class _ShopScreenState extends State<ShopScreen> with SingleTickerProviderStateM
           children: [
             Expanded(
               child: ClipRRect(
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(10)),
                 child: listing.imageUrl != null
                     ? Image.network(
-                  listing.imageUrl,
-                  fit: BoxFit.cover,
-                  width: double.infinity,
-                )
+                        listing.imageUrl,
+                        fit: BoxFit.cover,
+                        width: double.infinity,
+                      )
                     : const Center(child: Icon(Icons.image_not_supported)),
               ),
             ),

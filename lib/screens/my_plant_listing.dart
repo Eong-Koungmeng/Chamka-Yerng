@@ -23,6 +23,7 @@ class _MyPlantListingState extends State<MyPlantListing> {
     super.initState();
     _loadUserData();
   }
+
   Future<void> _loadUserData() async {
     try {
       setState(() {
@@ -36,10 +37,8 @@ class _MyPlantListingState extends State<MyPlantListing> {
         return;
       }
 
-      final userSnapshot = await _database
-          .child('users')
-          .child(currentUser.uid)
-          .get();
+      final userSnapshot =
+          await _database.child('users').child(currentUser.uid).get();
 
       if (userSnapshot.exists) {
         final userData = userSnapshot.value as Map<dynamic, dynamic>;
@@ -77,8 +76,10 @@ class _MyPlantListingState extends State<MyPlantListing> {
 
         if (userId != null) {
           final listings = data
-              .map((data) => PlantListing.fromMap(data.value as Map<dynamic, dynamic>))
-              .where((listing) => listing.sellerId == userId) // Filter by sellerId
+              .map((data) =>
+                  PlantListing.fromMap(data.value as Map<dynamic, dynamic>))
+              .where(
+                  (listing) => listing.sellerId == userId) // Filter by sellerId
               .toList();
 
           setState(() {
@@ -109,43 +110,45 @@ class _MyPlantListingState extends State<MyPlantListing> {
   Widget build(BuildContext context) {
     return Scaffold(
         resizeToAvoidBottomInset: false,
-        appBar:  AppBar(
-      toolbarHeight: 70,
-      title: Text("My Listing"),
-      elevation: 0.0,
-      backgroundColor: Colors.transparent,
-      shadowColor: Colors.transparent,
-      titleTextStyle: Theme.of(context).textTheme.displayLarge,
-    ),
-    body:  _isLoading
-        ? Center(child: CircularProgressIndicator()): _allPlantListings.isEmpty
-        ? const Center(child: Text('No plants found.'))
-        :
-    RefreshIndicator(
-        onRefresh: _fetchPlantListings,
-        child: Column(
-          children: [
-            // Listings
-            Expanded(
-              child: _allPlantListings.isEmpty
-                  ? const Center(child: Text('No plants found.'))
-                  : GridView.builder(
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 10,
-                  mainAxisSpacing: 10,
-                  childAspectRatio: 0.75,
-                ),
-                itemCount: _allPlantListings.length,
-                itemBuilder: (context, index) {
-                  final listing = _allPlantListings[index];
-                  return _buildPlantCard(listing);
-                },
-              ),
-            ),
-          ],
-        )));
+        appBar: AppBar(
+          toolbarHeight: 70,
+          title: Text("My Listing"),
+          elevation: 0.0,
+          backgroundColor: Colors.transparent,
+          shadowColor: Colors.transparent,
+          titleTextStyle: Theme.of(context).textTheme.displayLarge,
+        ),
+        body: _isLoading
+            ? Center(child: CircularProgressIndicator())
+            : _allPlantListings.isEmpty
+                ? const Center(child: Text('No plants found.'))
+                : RefreshIndicator(
+                    onRefresh: _fetchPlantListings,
+                    child: Column(
+                      children: [
+                        // Listings
+                        Expanded(
+                          child: _allPlantListings.isEmpty
+                              ? const Center(child: Text('No plants found.'))
+                              : GridView.builder(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 10),
+                                  gridDelegate:
+                                      const SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 2,
+                                    crossAxisSpacing: 10,
+                                    mainAxisSpacing: 10,
+                                    childAspectRatio: 0.75,
+                                  ),
+                                  itemCount: _allPlantListings.length,
+                                  itemBuilder: (context, index) {
+                                    final listing = _allPlantListings[index];
+                                    return _buildPlantCard(listing);
+                                  },
+                                ),
+                        ),
+                      ],
+                    )));
   }
 
   Widget _buildPlantCard(PlantListing listing) {
@@ -168,13 +171,14 @@ class _MyPlantListingState extends State<MyPlantListing> {
           children: [
             Expanded(
               child: ClipRRect(
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(10)),
                 child: listing.imageUrl != null
                     ? Image.network(
-                  listing.imageUrl,
-                  fit: BoxFit.cover,
-                  width: double.infinity,
-                )
+                        listing.imageUrl,
+                        fit: BoxFit.cover,
+                        width: double.infinity,
+                      )
                     : const Center(child: Icon(Icons.image_not_supported)),
               ),
             ),

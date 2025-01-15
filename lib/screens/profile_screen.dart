@@ -336,7 +336,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             helperText: 'Enter your phone number',
                           ),
                         ),
-
                       ],
                     ),
                   ),
