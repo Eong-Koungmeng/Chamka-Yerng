@@ -22,10 +22,12 @@ class _MyPlantListingState extends State<MyPlantListing> {
     print("init shop");
     super.initState();
     _loadUserData();
-    _fetchPlantListings();
   }
   Future<void> _loadUserData() async {
     try {
+      setState(() {
+        _isLoading = true;
+      });
       final User? currentUser = _auth.currentUser;
 
       if (currentUser == null) {
@@ -43,6 +45,10 @@ class _MyPlantListingState extends State<MyPlantListing> {
         final userData = userSnapshot.value as Map<dynamic, dynamic>;
         setState(() {
           _userId = currentUser.uid;
+        });
+        _fetchPlantListings();
+        setState(() {
+          _isLoading = false;
         });
       } else {
         ScaffoldMessenger.of(context).showSnackBar(

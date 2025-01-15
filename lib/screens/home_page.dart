@@ -1,5 +1,6 @@
 import 'package:background_fetch/background_fetch.dart';
 import 'package:chamka_yerng/screens/add_plant_listing.dart';
+import 'package:chamka_yerng/screens/my_favorite_screen.dart';
 import 'package:chamka_yerng/screens/my_plant_listing.dart';
 import 'package:chamka_yerng/screens/shop_screen.dart';
 import 'package:flutter/material.dart';
@@ -313,6 +314,20 @@ class _MyHomePageState extends State<MyHomePage> {
                     context,
                     MaterialPageRoute<void>(
                       builder: (context) => const MyPlantListing(),
+                    ));
+              })
+              : const SizedBox.shrink(),
+          _currentPage == Page.shop
+              ? IconButton(
+              icon: const Icon(Icons.favorite),
+              iconSize: 25,
+              color: Theme.of(context).colorScheme.primary,
+              tooltip: "My Favorite",
+              onPressed: () async {
+                await Navigator.push(
+                    context,
+                    MaterialPageRoute<void>(
+                      builder: (context) => const MyFavoriteScreen(),
                     ));
               })
               : const SizedBox.shrink(),

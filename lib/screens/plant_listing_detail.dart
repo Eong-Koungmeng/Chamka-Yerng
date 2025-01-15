@@ -2,6 +2,7 @@ import 'package:chamka_yerng/screens/plant_listing_update.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
 import '../data/plant_listing.dart';
@@ -22,14 +23,43 @@ class _PlantListingDetailState extends State<PlantListingDetail> {
   late PlantListing _listing;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final DatabaseReference _database = FirebaseDatabase.instance.ref();
+  late DatabaseReference _favoritesRef;
+  bool _isFavorite = false;
   String? _userId;
   bool _wasEdited = false;
+
   @override
   void initState() {
     super.initState();
     _listing = widget.listing;
     _loadUserData();
   }
+
+  void _checkIfFavorite() async {
+    final snapshot = await _favoritesRef.get();
+    setState(() {
+      _isFavorite = snapshot.exists;
+    });
+  }
+
+  void _toggleFavorite() async {
+    if (_isFavorite) {
+      await _favoritesRef.remove();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Removed from Favorites')),
+      );
+    } else {
+      await _favoritesRef.set(true);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Added to Favorites')),
+      );
+    }
+    setState(() {
+      _isFavorite = !_isFavorite;
+    });
+  }
+
+
   Future<void> _loadUserData() async {
     try {
       final User? currentUser = _auth.currentUser;
@@ -50,6 +80,9 @@ class _PlantListingDetailState extends State<PlantListingDetail> {
         setState(() {
           _userId = currentUser.uid;
         });
+        _favoritesRef = FirebaseDatabase.instance
+            .ref('/favorites/$_userId/${_listing.id}');
+        _checkIfFavorite();
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Error loading user data')),
@@ -234,39 +267,36 @@ class _PlantListingDetailState extends State<PlantListingDetail> {
                   child: Row(
                     children: [
                       Expanded(
-                        child: ElevatedButton.icon(
+                        child:
+                        ElevatedButton.icon(
                           onPressed: () {
-                            // Placeholder for future "Contact Seller" action
+                            Clipboard.setData(ClipboardData(text: _listing.sellerContact)); // Copy to clipboard
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Contact Seller action')),
+                              SnackBar(content: Text('Seller contact copied: $_listing.sellerContact')),
                             );
                           },
-                          icon: const Icon(Icons.message),
-                          label: const Text('Contact Seller'),
+                          icon: const Icon(Icons.copy), // Changed icon to indicate copying
+                          label: const Text('Copy Seller Contact'),
                           style: ElevatedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(vertical: 12),
-                            shape: RoundedRectangleBorder( // Add this
-                              borderRadius: BorderRadius.circular(10.0), // Adjust radius as needed
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10.0),
                             ),
                           ),
-                        ),
+                        )
                       ),
                       const SizedBox(width: 10),
                       Expanded(
-                        child: ElevatedButton.icon(
-                          onPressed: () {
-                            // Placeholder for future "Add to Favorites" action
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Added to Favorites')),
-                            );
-                          },
-                          icon: const Icon(Icons.favorite_border),
-                          label: const Text('Add to Favorites'),
+                        child:
+                        ElevatedButton.icon(
+                          onPressed: _toggleFavorite,
+                          icon: Icon(_isFavorite ? Icons.favorite : Icons.favorite_border),
+                          label: Text(_isFavorite ? 'Unfavourite' : 'Favourite'),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.lightGreen,
+                            backgroundColor: _isFavorite ? Colors.red : Colors.lightGreen,
                             padding: const EdgeInsets.symmetric(vertical: 12),
-                            shape: RoundedRectangleBorder( // Add this
-                              borderRadius: BorderRadius.circular(10.0), // Adjust radius as needed
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10.0),
                             ),
                           ),
                         ),
