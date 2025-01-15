@@ -215,7 +215,7 @@ class _MyHomePageState extends State<MyHomePage> {
     } else if (_currentPage == Page.today) {
       return AppLocalizations.of(context)!.buttonToday;
     } else {
-      return "Shop";
+      return AppLocalizations.of(context)!.shop;
     }
   }
 
@@ -342,7 +342,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   context,
                   MaterialPageRoute<void>(
                     builder: (context) =>
-                        const SettingsScreen(title: "Settings Screen"),
+                        SettingsScreen(title: AppLocalizations.of(context)!.settings),
                   ));
             },
           ),
@@ -393,7 +393,7 @@ class _MyHomePageState extends State<MyHomePage> {
             selectedIcon:
                 Icon(Icons.store, color: Theme.of(context).colorScheme.surface),
             icon: const Icon(Icons.store_outlined),
-            label: "Shop",
+            label: AppLocalizations.of(context)!.shop,
           ),
         ],
       ),

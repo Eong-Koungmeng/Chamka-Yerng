@@ -2,7 +2,8 @@ import 'package:chamka_yerng/screens/forgot_password_screen.dart';
 import 'package:chamka_yerng/screens/register_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'home_page.dart';
 
 class LoginPage extends StatelessWidget {
@@ -19,7 +20,7 @@ class LoginPage extends StatelessWidget {
       );
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => MyHomePage(title: 'Today')),
+        MaterialPageRoute(builder: (context) => MyHomePage(title: AppLocalizations.of(context)!.buttonToday)),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -41,9 +42,9 @@ class LoginPage extends StatelessWidget {
             children: [
               Image.asset('assets/Logo.png', height: 75),
               const SizedBox(height: 20),
-              const Text(
-                'Login to Your Account',
-                style: TextStyle(
+              Text(
+                AppLocalizations.of(context)!.loginAccount,
+                style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w600,
                   color: Color(0xff8CA37B),
@@ -53,7 +54,7 @@ class LoginPage extends StatelessWidget {
               TextField(
                 controller: emailController,
                 decoration: InputDecoration(
-                  labelText: 'Email',
+                  labelText: AppLocalizations.of(context)!.email,
                   filled: true,
                   fillColor: Colors.lightGreen[100], // Light green background
                   enabledBorder: OutlineInputBorder(
@@ -84,7 +85,7 @@ class LoginPage extends StatelessWidget {
                 obscureText: true,
                 controller: passwordController,
                 decoration: InputDecoration(
-                  labelText: 'Password',
+                  labelText: AppLocalizations.of(context)!.password,
                   filled: true,
                   fillColor: Colors.lightGreen[100],
                   enabledBorder: OutlineInputBorder(
@@ -117,7 +118,7 @@ class LoginPage extends StatelessWidget {
                         builder: (context) => ForgotPasswordPage()),
                   ),
                   child: Text(
-                    'Forgot Password?',
+                    AppLocalizations.of(context)!.forgotPassword,
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       color: Color(0xFF8CA37B),
@@ -143,9 +144,9 @@ class LoginPage extends StatelessWidget {
                         padding:
                             EdgeInsets.symmetric(vertical: 12, horizontal: 32),
                       ),
-                      child: const Text(
-                        'Login',
-                        style: TextStyle(
+                      child: Text(
+                        AppLocalizations.of(context)!.login,
+                        style: const TextStyle(
                           fontSize: 18.0,
                           fontWeight: FontWeight.bold,
                           color: Colors.white, // White text color for contrast
@@ -169,9 +170,9 @@ class LoginPage extends StatelessWidget {
                         padding:
                             EdgeInsets.symmetric(vertical: 12, horizontal: 32),
                       ),
-                      child: const Text(
-                        'Register',
-                        style: TextStyle(
+                      child: Text(
+                        AppLocalizations.of(context)!.register,
+                        style: const TextStyle(
                           fontSize: 18.0,
                           fontWeight: FontWeight.bold,
                           color: Colors.white, // White text color for contrast
