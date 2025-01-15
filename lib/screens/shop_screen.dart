@@ -11,19 +11,22 @@ class ShopScreen extends StatefulWidget {
   State<ShopScreen> createState() => _ShopScreenState();
 }
 
-class _ShopScreenState extends State<ShopScreen> {
+class _ShopScreenState extends State<ShopScreen> with SingleTickerProviderStateMixin{
   final DatabaseReference _database = FirebaseDatabase.instance.ref();
   List<PlantListing> _allPlantListings = [];
   List<PlantListing> _displayedListings = [];
   bool _isLoading = false;
   String _searchQuery = "";
   bool _showLatest = true;
+  late TabController _tabController;
+  bool _isAscending = true;
   final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
     print("init shop");
     super.initState();
+    _tabController = TabController(length: 4, vsync: this);
     _fetchPlantListings();
   }
 
@@ -42,7 +45,7 @@ class _ShopScreenState extends State<ShopScreen> {
 
         setState(() {
           _allPlantListings = listings;
-          _displayedListings = listings;
+          _applyFiltersAndSorting();
         });
       } else {
         setState(() {
@@ -57,24 +60,49 @@ class _ShopScreenState extends State<ShopScreen> {
     }
   }
 
+  void _handleTabChange() {
+    _applyFiltersAndSorting();
+  }
+
+  void _applyFiltersAndSorting() {
+    List<PlantListing> filteredListings = _allPlantListings;
+
+    // Apply search query filter
+    if (_searchQuery.isNotEmpty) {
+      filteredListings = filteredListings
+          .where((listing) =>
+          listing.title.toLowerCase().contains(_searchQuery.toLowerCase()))
+          .toList();
+    }
+
+    // Apply sorting based on the selected tab
+    switch (_tabController.index) {
+      case 0: // Latest
+        filteredListings.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+        break;
+      case 1: // Popular
+        filteredListings.shuffle();
+        break;
+      case 2: // Price Low to High
+        filteredListings.sort((a, b) => a.price!.compareTo(b.price!));
+        break;
+      case 3: // Price High to Low
+        filteredListings.sort((a, b) => b.price!.compareTo(a.price!));
+        break;
+    }
+
+    setState(() {
+      _displayedListings = filteredListings;
+    });
+  }
   void _filterListings(String query) {
     setState(() {
       _searchQuery = query;
-      _displayedListings = _allPlantListings
-          .where((listing) =>
-          listing.title.toString().toLowerCase().contains(query.toLowerCase()))
-          .toList();
+      _applyFiltersAndSorting();
     });
   }
 
-  void _toggleListingType() {
-    setState(() {
-      _showLatest = !_showLatest;
-      _displayedListings = _showLatest
-          ? _allPlantListings
-          : List.from(_allPlantListings)..shuffle(); // Example for "popular"
-    });
-  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -123,23 +151,17 @@ class _ShopScreenState extends State<ShopScreen> {
 
               const SizedBox(height: 15),
               // Filters Row
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    _showLatest ? "Latest Plants" : "Popular Plants",
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  TextButton(
-                    onPressed: _toggleListingType,
-                    child: Text(
-                      _showLatest ? "Show Popular" : "Show Latest",
-                      style: const TextStyle(color: Colors.blue),
-                    ),
-                  ),
+              TabBar(
+                controller: _tabController,
+                onTap: (index) => _handleTabChange(),
+                labelColor: Colors.blue,
+                unselectedLabelColor: Colors.grey,
+                indicatorColor: Colors.blue,
+                tabs: const [
+                  Tab(text: 'Latest'),
+                  Tab(text: 'Popular'),
+                  Tab(text: 'Price ↑'),
+                  Tab(text: 'Price ↓'),
                 ],
               ),
             ],
@@ -150,7 +172,11 @@ class _ShopScreenState extends State<ShopScreen> {
             ? const Center(child: Text('No plants found.'))
             :
         Expanded(
-          child: GridView.builder(
+          child: _isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : _displayedListings.isEmpty
+              ? const Center(child: Text('No plants found.'))
+              : GridView.builder(
             padding: const EdgeInsets.symmetric(horizontal: 10),
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
@@ -166,7 +192,7 @@ class _ShopScreenState extends State<ShopScreen> {
           ),
         ),
       ],
-    ));
+        ),);
   }
 
   Widget _buildPlantCard(PlantListing listing) {
